@@ -1,0 +1,230 @@
+.user-main-noti {
+  width: 100%;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 10px;
+
+  .upper-component {
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    // display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h2 {
+      //   font-size: 22px;
+      //   font-weight: bold;
+      //   color: #333;
+    }
+    select {
+      box-sizing: border-box;
+      padding: 5px;
+      // font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+      outline: none;
+    }
+    .filter-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #ffffff;
+      padding: 10px 0px 5px 0px;
+      border-radius: 8px;
+      div{
+        width: 100%;
+        position: relative;
+        i{
+          position: absolute;
+          left: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #888;
+        }
+      }
+      input,
+      select {
+        padding: 7px 15px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: #f9f9f9;
+        outline: none;
+        min-width: 200px;
+        &:focus {
+          box-shadow: 0px 0px 1px gray;
+        }
+      }
+  
+      input {
+        flex: 1;
+        padding-left: 40px;
+        width: 100%;
+      }
+    }
+  }
+
+  .lower-component {
+    display: flex;
+    margin-top: 20px;
+    flex-direction: column;
+    gap: 12px;
+
+    .inner-component {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      transition: 0.3s ease-in-out;
+
+      &:hover {
+        cursor: pointer;
+        transform: translateY(-1px);
+        box-shadow: 0px 6px 5px rgba(0, 0, 0, 0.15);
+      }
+
+      .icon {
+        height: 40px;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #fff;
+        font-size: 18px;
+        margin-right: 10px;
+        transition: all 0.3s ease-in-out;
+
+        &.maintenance-request {
+          background: #ff9800;
+        }
+
+        &.asset-request {
+          background: #007bff;
+        }
+
+        &.warning {
+          background: #f44336;
+        }
+
+        &.info {
+          background: #007bff;
+        }
+
+        &:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+      }
+
+      .noti {
+        width: 60.5%;
+        padding-left: 10px;
+
+        p {
+          font-size: 14px;
+          color: #333;
+          margin: 0;
+
+          &:first-child {
+            font-weight: bold;
+            font-size: 16px;
+          }
+
+          &:nth-child(2) {
+            color: #666;
+            font-size: 15px;
+          }
+        }
+      }
+
+      .status {
+        width: 20%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 30px;
+        text-align: center;
+
+        p {
+          font-size: 14px;
+          font-weight: bold;
+          border-radius: 10px;
+          padding: 5px 10px;
+          text-transform: capitalize;
+
+         
+
+          &.approved_by_hr {
+            background: #cce5ff;
+            color: #004085;
+          }
+          &.asset_allocated {
+            background: #d4edda;
+            color: #155724;
+          }
+       
+          &.pending {
+            background: #ffeeba; 
+            color: #856404; 
+          }
+        
+          &.pending_by_it {
+            background: #ffd966; 
+            color: #7a5900; 
+          }
+          &.rejected {
+            background: #f8d7da;
+            color: #721c24;
+          }
+        }
+      }
+
+      .time {
+        width: 15%;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        color: #888;
+
+        i {
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}
+.unread-notification {
+  .icon {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 10px;
+      height: 10px;
+      background-color: #007bff;
+      border-radius: 50%;
+      animation: glow 1s infinite alternate ease-in-out;
+    }
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+    // transform: scale(1);
+  }
+  to {
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.8);
+    // transform: scale(1.2);
+  }
+}

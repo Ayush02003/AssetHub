@@ -1,0 +1,125 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.user-main {
+  padding: 10px;
+  background-color: #f4f7fc;
+}
+.user-main .upper-component {
+  background-color: white;
+  padding: 5px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.user-main .upper-component h2 {
+  display: block;
+  padding: 10px 0px 7px 0px;
+  color: #333;
+}
+.user-main select {
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  outline: none;
+}
+.user-main .filter-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #ffffff;
+  padding: 10px 0px 5px 0px;
+  border-radius: 8px;
+}
+.user-main .filter-container div {
+  width: 100%;
+  position: relative;
+}
+.user-main .filter-container div i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+.user-main .filter-container input,
+.user-main .filter-container select {
+  padding: 7px 15px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  outline: none;
+  min-width: 200px;
+}
+.user-main .filter-container input:focus,
+.user-main .filter-container select:focus {
+  box-shadow: 0px 0px 1px gray;
+}
+.user-main .filter-container input {
+  flex: 1;
+  padding-left: 40px;
+  width: 100%;
+}
+.user-main .lower-component {
+  margin-top: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.user-main .lower-component .inner-component table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.user-main .lower-component .inner-component table #title {
+  background-color: #f7f9fc;
+  color: #697489;
+  font-weight: bold;
+}
+.user-main .lower-component .inner-component table #title td {
+  padding: 15px 10px;
+  font-size: 18px;
+}
+.user-main .lower-component .inner-component table tr {
+  color: #1c2434;
+  font-size: 16px;
+}
+.user-main .lower-component .inner-component table tr td {
+  padding: 15px 0px;
+  text-align: center;
+}
+.user-main .lower-component .inner-component table tr td .status {
+  padding: 2px 5px;
+  border-radius: 5px;
+  display: inline-block;
+  text-align: center;
+}
+.user-main .lower-component .inner-component table tr td .assigned {
+  color: #22c55e;
+  border: 1px solid #22c55e;
+}
+.user-main .lower-component .inner-component table tr td .not-assigned {
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 5px;
+  transition: color 0.3s ease-in-out;
+}
+.icon-button i {
+  color: #697489;
+}
+.icon-button i:hover {
+  color: #586174;
+}/*# sourceMappingURL=users.css.map */

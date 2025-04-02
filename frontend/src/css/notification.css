@@ -1,0 +1,195 @@
+.user-main-noti {
+  width: 100%;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+.user-main-noti .upper-component {
+  background-color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  align-items: center;
+  justify-content: space-between;
+}
+.user-main-noti .upper-component select {
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  outline: none;
+}
+.user-main-noti .upper-component .filter-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #ffffff;
+  padding: 10px 0px 5px 0px;
+  border-radius: 8px;
+}
+.user-main-noti .upper-component .filter-container div {
+  width: 100%;
+  position: relative;
+}
+.user-main-noti .upper-component .filter-container div i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+.user-main-noti .upper-component .filter-container input,
+.user-main-noti .upper-component .filter-container select {
+  padding: 7px 15px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  outline: none;
+  min-width: 200px;
+}
+.user-main-noti .upper-component .filter-container input:focus,
+.user-main-noti .upper-component .filter-container select:focus {
+  box-shadow: 0px 0px 1px gray;
+}
+.user-main-noti .upper-component .filter-container input {
+  flex: 1;
+  padding-left: 40px;
+  width: 100%;
+}
+.user-main-noti .lower-component {
+  display: flex;
+  margin-top: 20px;
+  flex-direction: column;
+  gap: 12px;
+}
+.user-main-noti .lower-component .inner-component {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.3s ease-in-out;
+}
+.user-main-noti .lower-component .inner-component:hover {
+  cursor: pointer;
+  transform: translateY(-1px);
+  box-shadow: 0px 6px 5px rgba(0, 0, 0, 0.15);
+}
+.user-main-noti .lower-component .inner-component .icon {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  margin-right: 10px;
+  transition: all 0.3s ease-in-out;
+}
+.user-main-noti .lower-component .inner-component .icon.maintenance-request {
+  background: #ff9800;
+}
+.user-main-noti .lower-component .inner-component .icon.asset-request {
+  background: #007bff;
+}
+.user-main-noti .lower-component .inner-component .icon.warning {
+  background: #f44336;
+}
+.user-main-noti .lower-component .inner-component .icon.info {
+  background: #007bff;
+}
+.user-main-noti .lower-component .inner-component .icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.user-main-noti .lower-component .inner-component .noti {
+  width: 60.5%;
+  padding-left: 10px;
+}
+.user-main-noti .lower-component .inner-component .noti p {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+}
+.user-main-noti .lower-component .inner-component .noti p:first-child {
+  font-weight: bold;
+  font-size: 16px;
+}
+.user-main-noti .lower-component .inner-component .noti p:nth-child(2) {
+  color: #666;
+  font-size: 15px;
+}
+.user-main-noti .lower-component .inner-component .status {
+  width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  text-align: center;
+}
+.user-main-noti .lower-component .inner-component .status p {
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 5px 10px;
+  text-transform: capitalize;
+}
+.user-main-noti .lower-component .inner-component .status p.approved_by_hr {
+  background: #cce5ff;
+  color: #004085;
+}
+.user-main-noti .lower-component .inner-component .status p.asset_allocated {
+  background: #d4edda;
+  color: #155724;
+}
+.user-main-noti .lower-component .inner-component .status p.pending {
+  background: #ffeeba;
+  color: #856404;
+}
+.user-main-noti .lower-component .inner-component .status p.pending_by_it {
+  background: #ffd966;
+  color: #7a5900;
+}
+.user-main-noti .lower-component .inner-component .status p.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+.user-main-noti .lower-component .inner-component .time {
+  width: 15%;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #888;
+}
+.user-main-noti .lower-component .inner-component .time i {
+  margin-right: 5px;
+}
+
+.unread-notification .icon {
+  position: relative;
+}
+.unread-notification .icon::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  background-color: #007bff;
+  border-radius: 50%;
+  animation: glow 1s infinite alternate ease-in-out;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+  }
+  to {
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.8);
+  }
+}/*# sourceMappingURL=notification.css.map */

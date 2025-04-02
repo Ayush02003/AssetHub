@@ -1,0 +1,383 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.main-noti-detail {
+  background-color: #ffffff;
+  border-top-left-radius: 15px;
+  padding: 20px;
+}
+.main-noti-detail .title-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 5px;
+}
+.main-noti-detail .title-container i {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #555;
+  background: #f2f2f2;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+.main-noti-detail .title-container i:hover {
+  background: #e0e0e0;
+  cursor: pointer;
+  box-shadow: 0px 0px 2px lightgray;
+}
+.main-noti-detail .title-container p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+.main-noti-detail .asset-detail {
+  margin: 20px 20px 20px 20px;
+  box-shadow: 0px 0px 5px rgb(225, 229, 230);
+  display: flex;
+  background-color: #f7f9fc;
+  border-top-left-radius: 50px;
+  border-bottom-left-radius: 50px;
+  position: relative;
+}
+.main-noti-detail .asset-detail .user-info {
+  align-items: center;
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+}
+.main-noti-detail .asset-detail .user-info p {
+  color: #3b4351;
+  padding: 6px 12px;
+  font-weight: 600;
+  background: rgba(240, 242, 245, 0.8);
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  display: inline-block;
+  margin-left: 20px;
+  transition: all 0.3s ease-in-out;
+}
+.main-noti-detail .asset-detail:hover {
+  transition: 0.5s;
+  cursor: pointer;
+  transform: scale(1.001);
+  box-shadow: 0px 0px 15px rgb(225, 229, 230);
+}
+.main-noti-detail .asset-detail img {
+  box-shadow: 0px 0px 5px #2f3a56;
+}
+.main-noti-detail .available-laptop {
+  margin: 10px 0px 20px 0px;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+}
+.main-noti-detail .available-laptop p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.main-noti-detail .available-laptop p i {
+  font-size: 20px;
+}
+.main-noti-detail .available-laptop .laptop-data {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.main-noti-detail .available-laptop .laptop-data select,
+.main-noti-detail .available-laptop .laptop-data input {
+  padding: 7px 10px;
+  font-size: 15px;
+  border-radius: 6px;
+  transition: all 0.3s ease-in-out;
+}
+.main-noti-detail .available-laptop .laptop-data select {
+  width: 25%;
+  border: 1px solid #ccc;
+  background: #f7f9fc;
+  cursor: pointer;
+}
+.main-noti-detail .available-laptop .laptop-data select:focus {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  background: #ffffff;
+}
+.main-noti-detail .available-laptop .laptop-data input {
+  flex: 2;
+  background: #f7f9fc;
+  border: 1px solid #ddd;
+  outline: none;
+}
+.main-noti-detail .asset-software-detail {
+  display: flex;
+  align-items: flex-start;
+}
+.main-noti-detail .asset-software-detail .asset-data {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
+  width: 55%;
+}
+.main-noti-detail .asset-software-detail .asset-data table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+.main-noti-detail .asset-software-detail .asset-data table tr {
+  border-bottom: 1px solid #ddd;
+  transition: background 0.3s ease-in-out;
+}
+.main-noti-detail .asset-software-detail .asset-data table tr:last-child {
+  border-bottom: none;
+}
+.main-noti-detail .asset-software-detail .asset-data table tr:nth-child(even) {
+  background: #f9fbfd;
+}
+.main-noti-detail .asset-software-detail .asset-data table tr:hover {
+  background: rgba(0, 123, 255, 0.1);
+}
+.main-noti-detail .asset-software-detail .asset-data table td {
+  padding: 10px 18px;
+  font-size: 16px;
+  color: #333;
+  text-align: left;
+}
+.main-noti-detail .asset-software-detail .asset-data table td:first-child {
+  font-weight: 600;
+  color: #222;
+  width: 35%;
+}
+.main-noti-detail .asset-software-detail .asset-data table td:last-child {
+  font-weight: 500;
+  color: #555;
+}
+.main-noti-detail .asset-software-detail .asset-data table td input {
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f7f9fc;
+  transition: all 0.3s ease-in-out;
+  outline: none;
+}
+.main-noti-detail .asset-software-detail .asset-data table td input:focus {
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(0, 112, 243, 0.3);
+}
+.main-noti-detail .asset-software-detail .asset-data table td input:-moz-read-only {
+  background: rgba(240, 242, 245, 0.6);
+  cursor: not-allowed;
+}
+.main-noti-detail .asset-software-detail .asset-data table td input:read-only {
+  background: rgba(240, 242, 245, 0.6);
+  cursor: not-allowed;
+}
+.main-noti-detail .asset-software-detail .asset-data table td input[type=date] {
+  padding: 8px;
+}
+.main-noti-detail .asset-software-detail .asset-data table td input[type=text], .main-noti-detail .asset-software-detail .asset-data table td input[type=number] {
+  text-transform: capitalize;
+}
+.main-noti-detail .asset-software-detail .asset-data table td input::-moz-placeholder {
+  color: #888;
+}
+.main-noti-detail .asset-software-detail .asset-data table td input::placeholder {
+  color: #888;
+}
+.main-noti-detail .asset-software-detail .asset-data table td .software-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 5px;
+}
+.main-noti-detail .asset-software-detail .asset-data table td .software-bubbles .software-bubble {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out;
+}
+.main-noti-detail .asset-software-detail .asset-data table td .software-bubbles .software-bubble:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+.main-noti-detail .asset-software-detail .asset-data table td .no-software {
+  color: gray;
+  font-style: italic;
+}
+.main-noti-detail .asset-software-detail .software-data {
+  border-radius: 12px;
+  padding-left: 20px;
+  width: 45%;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail {
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3e50;
+  border-left: 5px solid #007bff;
+  padding-left: 12px;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table tr {
+  border-bottom: 1px solid #ddd;
+  transition: background 0.3s ease-in-out;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table tr:nth-child(even) {
+  background: #f3f6fa;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table tr:hover {
+  background: rgba(0, 123, 255, 0.08);
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table td {
+  padding: 10px 15px;
+  font-size: 16px;
+  color: #333;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table td:first-child {
+  font-weight: 600;
+  color: #2b3a4a;
+  width: 35%;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table td:last-child {
+  font-weight: 500;
+  color: #555;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table td select, .main-noti-detail .asset-software-detail .software-data .software-detail table td input {
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 15px;
+  border: 1px solid #c5d1e0;
+  border-radius: 6px;
+  background: #f8fbff;
+  transition: all 0.3s ease-in-out;
+  outline: none;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table td select:focus, .main-noti-detail .asset-software-detail .software-data .software-detail table td input:focus {
+  background: #ffffff;
+  box-shadow: 0 0 3px rgba(0, 112, 243, 0.3);
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table td select::-moz-placeholder, .main-noti-detail .asset-software-detail .software-data .software-detail table td input::-moz-placeholder {
+  color: #8898aa;
+}
+.main-noti-detail .asset-software-detail .software-data .software-detail table td select::placeholder, .main-noti-detail .asset-software-detail .software-data .software-detail table td input::placeholder {
+  color: #8898aa;
+}
+.main-noti-detail .asset-software-detail .action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+.main-noti-detail .asset-software-detail .action-buttons button {
+  width: 32%;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+.main-noti-detail .asset-software-detail .action-buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+.main-noti-detail .asset-software-detail .action-buttons .approve-btn {
+  background: linear-gradient(135deg, #0070f3, #009688);
+}
+.main-noti-detail .asset-software-detail .action-buttons .approve-btn:hover {
+  background: linear-gradient(135deg, #005bbb, #00796b);
+}
+.main-noti-detail .asset-software-detail .action-buttons .reject-btn {
+  background: linear-gradient(135deg, #ff6b6b, #d84315);
+}
+.main-noti-detail .asset-software-detail .action-buttons .reject-btn:hover {
+  background: linear-gradient(135deg, #e53935, #bf360c);
+}
+.main-noti-detail .asset-software-detail .action-buttons .pending-btn {
+  background: linear-gradient(135deg, #f4b400, #faad47);
+}
+.main-noti-detail .asset-software-detail .action-buttons .pending-btn:hover {
+  background: linear-gradient(135deg, #e69a00, #ff6f00);
+}
+.main-noti-detail .action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  width: 100%;
+}
+.main-noti-detail .action-buttons button {
+  width: 29%;
+  padding: 10px 0;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+.main-noti-detail .action-buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+.main-noti-detail .action-buttons button:active {
+  transform: scale(0.98);
+}
+.main-noti-detail .action-buttons .approve-btn {
+  background: linear-gradient(135deg, #0070f3, #009688); /* Blue to Teal */
+}
+.main-noti-detail .action-buttons .approve-btn:hover {
+  background: linear-gradient(135deg, #005bbb, #00796b);
+}
+.main-noti-detail .action-buttons .reject-btn {
+  background: linear-gradient(135deg, #ff6b6b, #d84315); /* Orange-Red */
+}
+.main-noti-detail .action-buttons .reject-btn:hover {
+  background: linear-gradient(135deg, #e53935, #bf360c);
+}
+.main-noti-detail .action-buttons .pending-btn {
+  background: linear-gradient(135deg, #f4b400, #faad47); /* Yellow-Orange */
+}
+.main-noti-detail .action-buttons .pending-btn:hover {
+  background: linear-gradient(135deg, #e69a00, #ff6f00);
+}/*# sourceMappingURL=asset_detail.css.map */
