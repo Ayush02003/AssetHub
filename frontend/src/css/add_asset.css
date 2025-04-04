@@ -31,12 +31,48 @@
   width: 100%;
 }
 .asset_main .asset_form .asset-lower-part table tr td:has(label) {
-  padding-bottom: 10px;
-  padding-top: 20px;
+  padding-bottom: 8px;
+  padding-top: 15px;
 }
 .asset_main .asset_form .asset-lower-part table tr td {
   padding: 3px 0px;
   position: relative;
+}
+.asset_main .asset_form .asset-lower-part table tr td .add_field {
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 1px 5px;
+  padding-left: 22px;
+  margin-left: 10px;
+  border: 1.5px solid #3469a9;
+  background-color: #f4f8fd;
+  color: #3469a9;
+  border-radius: 6px;
+  cursor: pointer;
+  gap: 5px;
+  transition: all 0.3s ease-in-out;
+}
+.asset_main .asset_form .asset-lower-part table tr td .add_field i {
+  position: absolute;
+  left: 5px;
+  top: 4px;
+  color: #3469a9;
+}
+.asset_main .asset_form .asset-lower-part table tr td .add_field:hover {
+  transform: scale(1.015);
+}
+.asset_main .asset_form .asset-lower-part table tr td .specification {
+  width: 40%;
+  position: relative;
+}
+.asset_main .asset_form .asset-lower-part table tr td .specification i {
+  margin-top: -7px;
+}
+.asset_main .asset_form .asset-lower-part table tr td .specification button {
+  right: 50px;
+  top: 5px;
+  position: absolute;
 }
 .asset_main .asset_form .asset-lower-part table tr td select {
   width: 100%;

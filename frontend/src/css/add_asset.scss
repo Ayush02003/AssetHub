@@ -31,13 +31,49 @@
         width: 100%;
         tr {
           td:has(label) {
-            padding-bottom: 10px;
-            padding-top: 20px;
+            padding-bottom: 8px;
+            padding-top: 15px;
           }
           td {
             padding: 3px 0px;
             position: relative;
-
+            .add_field {
+              position: relative;
+              i{
+                position: absolute;
+                left: 5px;
+                top: 4px;
+                color: #3469a9;
+              }
+              font-size: 14px;
+              font-weight: 500;
+              padding: 1px 5px;
+              padding-left: 22px;
+              margin-left: 10px;
+              border: 1.5px solid #3469a9;
+              background-color: #f4f8fd;
+              color: #3469a9;
+              border-radius: 6px;
+              cursor: pointer;
+              gap: 5px;
+              transition: all 0.3s ease-in-out;
+            
+              &:hover {
+                transform:scale(1.015)
+             }
+            }
+            .specification{
+              width: 40%;
+              position: relative;
+              i{
+                margin-top: -7px;
+              }
+              button{
+                right: 50px;
+                top: 5px;
+                position: absolute;
+              }
+            }
             select {
               width: 100%;
               background-color: #f0f4fa;

@@ -8,7 +8,7 @@ const Add_asset = () => {
   const [type, setType] = useState("");
   const [serial_num, setSerialNum] = useState("");
   const [price, setPrice] = useState("");
-  const [desc, setDesc] = useState("");
+  let [other_desc, setOtherDesc] = useState("");
   const [brand, setBrand] = useState("");
   const [purchase_date, setPurchase_date] = useState("");
   const [warranty_exp, setWarranty_exp] = useState("");
@@ -18,6 +18,9 @@ const Add_asset = () => {
   const [previewPic2, setPreviewPic2] = useState(null);
   const { loading, add_asset } = use_addAsset();
   const [asset_types, setassetType] = useState([]);
+
+  const [fields, setFields] = useState([]);
+  const [fieldValues, setFieldValues] = useState({});
 
   // const today = new Date().toISOString().split("T")[0];
   useEffect(() => {
@@ -32,18 +35,42 @@ const Add_asset = () => {
     };
     fetchAsset();
   }, []);
+
+  useEffect(() => {
+    if (type) {
+      const selectedType = asset_types.find((asset) => asset.type === type);
+      if (selectedType && selectedType.fields) {
+        setFields(selectedType.fields);
+      }
+    }
+  }, [type]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!pic1 || !pic2) {
-      alert("Please upload both images.");
+      toast("Please upload both images.", {
+        icon: "⚠️",
+        style: {
+          border: "1px solid #FFA500",
+          backgroundColor: "#FFF3CD",
+          color: "#856404",
+        },
+      });
       return;
+    }
+    let formattedDesc = Object.entries(fieldValues)
+      .map(([key, value]) => `${key} - ${value}`)
+      .join(", ");
+    if (other_desc.trim()) {
+      formattedDesc += formattedDesc
+        ? `, Other Details - ${other_desc}`
+        : `Other Details - ${other_desc}`;
     }
     await add_asset(
       name,
       type,
       serial_num,
       price,
-      desc,
+      formattedDesc,
       brand,
       purchase_date,
       warranty_exp,
@@ -52,12 +79,13 @@ const Add_asset = () => {
     );
     setName("");
     setType("");
-    setDesc("");
+    setOtherDesc("");
     setPrice("");
     setBrand("");
     setPurchase_date("");
     setWarranty_exp("");
     setSerialNum("");
+    setFieldValues({});
     document.getElementById("pic1Input").value = "";
     document.getElementById("pic2Input").value = "";
     setPic1(null);
@@ -70,6 +98,19 @@ const Add_asset = () => {
     setFile(file);
     setPreview(URL.createObjectURL(file));
   };
+  const iconMapping = {
+    ram: "fa-solid fa-memory",
+    storage: "fa-solid fa-hdd",
+    processor: "fa-solid fa-microchip",
+    graphics: "fa-solid fa-video",
+    screen: "fa-solid fa-desktop",
+    resolution: "fa-solid fa-tv",
+    weight: "fa-solid fa-weight-hanging",
+    battery: "fa-solid fa-battery-full",
+    camera: "fa-solid fa-camera",
+    ports: "fa-solid fa-plug",
+  };
+
   return (
     <div>
       <div className="asset_main">
@@ -98,12 +139,16 @@ const Add_asset = () => {
                       <option value="" disabled>
                         Select Asset Type
                       </option>
-                      {asset_types.filter((asset_type)=> asset_type.status.toLowerCase() != "inactive").
-                      map((asset_type) => (
-                        <option key={asset_type._id} value={asset_type.type}>
-                          {asset_type.type}
-                        </option>
-                      ))}
+                      {asset_types
+                        .filter(
+                          (asset_type) =>
+                            asset_type.status.toLowerCase() != "inactive"
+                        )
+                        .map((asset_type) => (
+                          <option key={asset_type._id} value={asset_type.type}>
+                            {asset_type.type}
+                          </option>
+                        ))}
                     </select>
                   </td>
                 </tr>
@@ -153,17 +198,45 @@ const Add_asset = () => {
                     <label htmlFor="">Description</label>
                   </td>
                 </tr>
+
+                {fields.map((field, index) => {
+                  const FieldName = field.toLowerCase();
+                  return (
+                    <tr key={index}>
+                      <td>
+                        <i
+                          className={
+                            iconMapping[FieldName] || "fa-solid fa-cogs"
+                          }
+                        ></i>
+                        <input
+                          required
+                          type="text"
+                          name={field}
+                          placeholder={`Enter ${field}`}
+                          value={fieldValues[field] || ""}
+                          onChange={(e) =>
+                            setFieldValues({
+                              ...fieldValues,
+                              [field]: e.target.value,
+                            })
+                          }
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+
                 <tr>
                   <td>
                     <i className="fa fa-info-circle"></i>
                     <input
-                      required
-                      placeholder="Enter asset detail (e.g., Processor- i9, Ram- 16gb)"
+                      placeholder="Any Other detail "
                       type="text"
-                      name="desc"
+                      name="other_desc"
                       id=""
-                      value={desc}
-                      onChange={(e) => setDesc(e.target.value)}
+                      value={other_desc}
+                      onChange={(e) => setOtherDesc(e.target.value)}
                     />
                   </td>
                 </tr>
@@ -309,7 +382,7 @@ const Add_asset = () => {
                       onClick={() => {
                         setName("");
                         setType("");
-                        setDesc("");
+                        setOtherDesc("");
                         setBrand("");
                         setPurchase_date("");
                         setWarranty_exp("");

@@ -4,14 +4,13 @@ import { useState } from "react";
 const UseAddAssetType = () => {
   const [loading, setLoading] = useState(false);
 
-  const add_asset_type = async (assetType, description, status) => {
+  const add_asset_type = async (assetType, description, status, fields) => {
     setLoading(true);
-
     try {
       const res = await fetch("/api/company/add_assetType", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type:assetType, description, status }), 
+        body: JSON.stringify({ type:assetType, description, status, fields }), 
       });
 
       const data = await res.json();

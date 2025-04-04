@@ -1,19 +1,41 @@
 import { useState } from "react";
 import "../../css/add_asset.css";
-import use_addAssetType from "../../hooks/UseAddAssetType.js"; 
+import use_addAssetType from "../../hooks/UseAddAssetType.js";
+import toast from "react-hot-toast";
 
 const Add_asset_type = () => {
-  const [assetType, setassetType] = useState("");
+  const [assetType, setAssetType] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("Active");
+  const [fields, setFields] = useState([""]);
   const { loading, add_asset_type } = use_addAssetType();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await add_asset_type(assetType, description, status); 
-    setassetType("");
+    if(fields.length === 0){
+      toast.error("Specification Required")
+      return
+    }
+    await add_asset_type(assetType, description, status, fields );
+    setAssetType("");
     setDescription("");
     setStatus("Active");
+    setFields([]);
+  };
+
+  const addField = () => {
+    setFields([...fields, ""]);
+  };
+
+  const updateField = (index, value) => {
+    const newFields = [...fields];
+    newFields[index] = value;
+    setFields(newFields);
+  };
+
+  const removeField = (index) => {
+    const newFields = fields.filter((_, i) => i !== index);
+    setFields(newFields);
   };
 
   return (
@@ -28,7 +50,9 @@ const Add_asset_type = () => {
             <form onSubmit={handleSubmit}>
               <table>
                 <tr>
-                  <td><label>Asset Type</label></td>
+                  <td>
+                    <label>Asset Type</label>
+                  </td>
                 </tr>
                 <tr>
                   <td>
@@ -38,13 +62,15 @@ const Add_asset_type = () => {
                       type="text"
                       placeholder="e.g., Laptop, Printer, Monitor"
                       value={assetType}
-                      onChange={(e) => setassetType(e.target.value)}
+                      onChange={(e) => setAssetType(e.target.value)}
                     />
                   </td>
                 </tr>
 
                 <tr>
-                  <td><label>Description</label></td>
+                  <td>
+                    <label>Description</label>
+                  </td>
                 </tr>
                 <tr>
                   <td>
@@ -60,12 +86,23 @@ const Add_asset_type = () => {
                 </tr>
 
                 <tr>
-                  <td><label>Status</label></td>
+                  <td>
+                    <label>Status</label>
+                  </td>
                 </tr>
                 <tr>
                   <td>
-                    <i className={`fa-solid ${status === "Active" ? "fa-circle-check" : "fa-circle-xmark"}`}></i>
-                    <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <i
+                      className={`fa-solid ${
+                        status === "Active"
+                          ? "fa-circle-check"
+                          : "fa-circle-xmark"
+                      }`}
+                    ></i>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                    >
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>
                     </select>
@@ -73,7 +110,42 @@ const Add_asset_type = () => {
                 </tr>
 
                 <tr>
-                <td className="button">
+                  <td>
+                    <label>Specification Fields</label>{" "}
+                    <button
+                      type="button"
+                      className="add_field"
+                      onClick={addField}
+                    >
+                      <i className="fa fa-plus"></i> Add Field
+                    </button>
+                  </td>
+                </tr>
+                {fields.map((field, index) => (
+                  <tr key={index}>
+                    <td>
+                      <div className="specification">
+                        <i>{index + 1}.</i>
+                        <input
+                          type="text"
+                          placeholder="Enter field name (e.g., RAM, Storage)"
+                          value={field}
+                          onChange={(e) => updateField(index, e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeField(index)}
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                <tr>
+                  <td className="button">
                     <button className="submit" type="submit" disabled={loading}>
                       {loading ? (
                         <span className="loading loading-spinner"></span>
@@ -86,9 +158,10 @@ const Add_asset_type = () => {
                       type="reset"
                       value="Cancel"
                       onClick={() => {
-                        setassetType("");
-                        setStatus("Active")
+                        setAssetType("");
+                        setStatus("Active");
                         setDescription("");
+                        setFields([]);
                       }}
                     />
                   </td>
