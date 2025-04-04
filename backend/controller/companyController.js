@@ -90,9 +90,8 @@ export const updateAssetType = async (req, res) => {
 
 export const addAssetType = async (req, res) => {
   try {
-    const { type, description, status } = req.body;  
-
-    if (!type || !description) {
+    const { type, description, status, fields } = req.body;  
+    if (!type || !description ) {
       return res.status(400).json({ error: "All fields are required" });
     }
     const existingAssetType = await AssetType.findOne({
@@ -106,6 +105,7 @@ export const addAssetType = async (req, res) => {
     const newAssetType = new AssetType({
       type,  
       description,
+      fields,
       status: status || "Active",
     });
 

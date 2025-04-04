@@ -17,6 +17,10 @@ const assetTypeSchema = new mongoose.Schema(
       enum: ["Active", "Inactive"], 
       default: "Active",
     },
+    fields: {
+      type: [String],
+      required: true,
+    },
   },
   { timestamps: true }
 );
