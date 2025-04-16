@@ -12,8 +12,12 @@ const getIconClass = (type) => {
       return "fa fa-wrench";
     case "system update":
       return "fa fa-laptop";
-    case "warning":
-      return "fa fa-exclamation-triangle";
+    case "software expiry":
+      return "fa fa-clock";
+    case "software request":
+      return "fa fa-laptop-code";
+    case "asset issue request":
+      return "fa fa-wrench";
     default:
       return "fa fa-bell";
   }
@@ -52,11 +56,13 @@ const Notification = () => {
   const filteredNotification = notifications.filter((noti) => {
     let match;
 
-    if (authUser.role === "IT-Person") {
-      match = noti.message.match(/to (.+)/i);
-    } else if (authUser.role === "HR") {
-      match = noti.message.match(/Request from (.+)/i);
-    }
+    // if (authUser.role === "IT-Person") {
+    match = noti.message.match(/(.+)/i);
+    // match = noti.message.match(/to (.+)/i);
+    // } else if (authUser.role === "HR") {
+    // match = noti.message.match(/(.+)/i);
+    // match = noti.message.match(/Request from (.+)/i);
+    // }
 
     const extractedName = match ? match[1] : "";
 
@@ -70,12 +76,12 @@ const Notification = () => {
   return (
     <div className="user-main-noti">
       <div className="upper-component">
-        <h2 style={{padding:"5px 0px"}}>Notification Management</h2>
-        {authUser.role !== "Employee" && (
+        <h2 style={{ padding: "5px 0px" }}>Notification Management</h2>
+        {authUser.role !== "Employe" && (
           <>
             <hr />
             <div className="filter-container">
-            <div>
+              <div>
                 <input
                   type="text"
                   placeholder="Search by Name"
@@ -102,16 +108,25 @@ const Notification = () => {
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
                 <option value="">All Status</option>
-                {/* {filterType === "Asset Request" && ( */}
-                  <>
-                    <option value="Asset_Allocated">Allocated</option>
-                    <option value="Pending_By_IT">Pending</option>
-                    <option value="Rejected">Rejected</option>
-                    <option value="Approved_By_HR">Approved By HR</option>
-                  </>
-                {/* )} */}
+                {[
+                  ...new Set(
+                    filteredNotification.map((noti) => {
+                      if (noti.type === "Software Expiry")
+                        return "software_expired";
+                      const request = requests.find(
+                        (req) => req._id === noti.requestId
+                      );
+                      return request?.requestStatus;
+                    })
+                  ),
+                ]
+                  .filter(Boolean)
+                  .map((status) => (
+                    <option key={status} value={status}>
+                      {status.replace(/_/g, " ")}
+                    </option>
+                  ))}
               </select>
-              
             </div>
           </>
         )}
@@ -129,26 +144,41 @@ const Notification = () => {
               );
               if (
                 filterStatus &&
-                (!matchingRequest ||
-                  matchingRequest.requestStatus !== filterStatus)
+                (notif.type !== "Software Expiry"
+                  ? !matchingRequest ||
+                    matchingRequest.requestStatus !== filterStatus
+                  : filterStatus !== "software_expired")
               ) {
                 return null;
               }
+
               const isUnread = notif.status === "unread";
 
               return (
                 <NavLink
-                  to={`/dashboard/notification/${
-                    authUser.role === "HR"
-                      ? "hr_notification_detail"
-                      : authUser.role === "IT-Person"
-                      ? "it_notification_detail"
-                      : "emp_notification_detail"
-                  }`}
+                  to={
+                    notif.type === "Software Expiry" &&
+                    authUser.role === "Employee"
+                      ? "/dashboard/home"
+                      : notif.type === "Software Expiry"
+                      ? `/dashboard/total_asset/asset_detail?id=${notif.assetId}`
+                      : `/dashboard/notification/${
+                          authUser.role === "HR"
+                            ? "hr_notification_detail"
+                            : authUser.role === "IT-Person" 
+                            ?  notif.type === "Asset Issue Request"
+                              ? "it_issue_detail"
+                              : "it_notification_detail"
+                            : "emp_notification_detail"
+                        }`
+                  }
                   key={notif._id}
                   onClick={() => {
-                    viewNotification(notif);
-                    viewRequest(matchingRequest);
+                    // viewRequest(matchingRequest);
+                    if (notif.type !== "Software Expiry") {
+                      viewNotification(notif);
+                      viewRequest(matchingRequest);
+                    }
                     changeNotificationStatus(notif._id, authUser.role);
                   }}
                 >
@@ -188,15 +218,35 @@ const Notification = () => {
                           "Your asset has been allocated": (
                             <p className="asset_allocated">Asset Allocated</p>
                           ),
-                        }[notif.message] || (
+                          "Software has been installed": (
+                            <p className="software_installed">
+                              Software Installed
+                            </p>
+                          ),
+                          "Your software request has been rejected by HR": (
+                            <p className="rejected">Rejected</p>
+                          ),
+                          "Your software request has been approved by HR": (
+                            <p className="approved_by_hr">Approved By HR</p>
+                          ),
+                          "Your software request has been pending by IT-Person":
+                            <p className="pending_by_it">Pending By IT</p>,
+                        }[notif.message] ||
+                        (notif.type?.toLowerCase() === "software expiry" ? (
+                          <p className="software_expired">Software Expired</p>
+                        ) : (
                           <p className="default-status">No Request</p>
-                        )
+                        ))
                       ) : matchingRequest ? (
                         <p
                           className={matchingRequest.requestStatus?.toLowerCase()}
                         >
                           {matchingRequest.requestStatus}
                         </p>
+                      ) : notif.type?.toLowerCase() === "software expiry" ? (
+                        <p className="software_expired">Software Expired</p>
+                      ) : notif.type?.toLowerCase() === "software request" ? (
+                        <p className="software_request">Software Request</p>
                       ) : (
                         <p className="default-status">No Request</p>
                       )}

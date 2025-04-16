@@ -1,92 +1,69 @@
 import { useState, useEffect } from "react";
 import "../../css/add_asset.css";
-import use_addAssetHelp from "../../hooks/UseAddAssetHelp";
+import use_addRequestSoftware from "../../hooks/UseAddRequestSoftware.js";
 import useAssetStore from "../../zustand/useAssetStore.js";
+// import toast from "react-hot-toast";
 
 import { useAuthContext } from "../../context/AuthContext.jsx";
-// import toast from "react-hot-toast";
-const Request_issue_form = () => {
-  const { assets, fetchUserAssets } = useAssetStore();
-  const { authUser } = useAuthContext();
+const Request_software = () => {
+    const { assets, fetchUserAssets } = useAssetStore();
+    const { authUser } = useAuthContext();
 
-  useEffect(() => {
+    useEffect(() => {
     fetchUserAssets(authUser.id);
   }, []);
-  const [file, setFile] = useState(null);
-  const [lost_date, setLostDate] = useState(null);
-  const [type, setType] = useState("");
+
   const [assignedLaptopId, setAssignedLaptopId] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState("");
+  const [version, setVersion] = useState("");
   const [assetType, setAssetType] = useState("");
-  const { loading, requestAssetIssue } = use_addAssetHelp();
-  const today = new Date().toISOString().split("T")[0];
-  const [previewPic1, setPreviewPic1] = useState(null);
+  const [software_purpose, setSoftware_purpose] = useState("");
+  const [expected_duration, setExpected_duration] = useState("");
+  const { loading, request_software } = use_addRequestSoftware();
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await requestAssetIssue(assignedLaptopId, type, file, lost_date, description);
+    await request_software(
+      assignedLaptopId,
+      name,
+      version,
+      software_purpose,
+      expected_duration,
+    );
 
     setAssignedLaptopId("");
-    setFile(null);
-    setType("");
-    setLostDate("");
-    setDescription("");
-    setAssetType("");
-    setPreviewPic1(null);
+    setName("");
+    setVersion("");
+    setSoftware_purpose("")
+    setAssetType("")
+    setExpected_duration("");
   };
-  const handleFileChange = (e, setFile,setPreview) => {
-    const file = e.target.files[0];
-      setFile(file); 
-      setPreview(URL.createObjectURL(file));
-  };
+
   return (
     <div className="asset_main">
       <style>
         {`
-            select {
-              width: 100%;
-              background-color: #F0F4FA;
-              padding: 8px 10px 8px 50px;
-              appearance: none;
-              border-radius: 5px;
-              cursor: pointer;
-            }
-          `}
+          select {
+            width: 100%;
+            background-color: #F0F4FA;
+            padding: 8px 10px 8px 50px;
+            appearance: none;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+        `}
       </style>
-      <h2>Request Issue Form</h2>
+      <h2>REQUEST SOFTWARE</h2>
       <div className="asset_form">
         <div className="asset-upper-part">
-          <h4>Asset Information</h4>
+          <h4>Software Information</h4>
         </div>
         <div className="asset-lower-part">
           <form onSubmit={handleSubmit}>
             <table>
               <tbody>
-                <tr>
-                  <td>
-                    <label>Request Type</label>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <i
-                      className={`fa ${
-                        type === "maintenance"
-                          ? "fa-wrench"
-                          : "fa-exclamation-triangle"
-                      }`}
-                    ></i>
-                    <select
-                      value={type}
-                      onChange={(e) => setType(e.target.value)}
-                      required
-                    >
-                      <option value="">Select Type</option>
-                      <option value="maintenance">Request Maintenance</option>
-                      <option value="lost">Report Lost</option>
-                    </select>
-                  </td>
-                </tr>
                 <tr>
                   <td>
                     <label>Select Your Asset Type</label>
@@ -171,92 +148,92 @@ const Request_issue_form = () => {
                     />
                   </td>
                 </tr>
-                {type === "lost" && (
-                  <>
-                    <tr>
-                      <td>
-                        <label>Lost Date</label>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <i className="fa fa-calendar-alt"></i>
-                        <input
-                          type="date"
-                          value={lost_date}
-                          max={today}
-                          onChange={(e) => setLostDate(e.target.value)}
-                          required
-                        />
-                      </td>
-                    </tr>
-                  </>
-                )}
-
                 <tr>
                   <td>
-                    <label>
-                      {type === "lost"
-                        ? "Explain how asset was lost"
-                        : type === "maintenance"
-                        ? "Describe the issue"
-                        : "Description"}
-                    </label>
+                    <label>Software Name</label>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <textarea
-                      required
-                      placeholder={
-                        type === "lost"
-                          ? "Describe the circumstances of the loss"
-                          : "Provide detailed information about the maintenance issue"
-                      }
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      rows={3}
-                      style={{
-                        resize: "none",
-                        backgroundColor: "#F0F4FA",
-                        width: "100%",
-                        padding: "8px",
-                        borderRadius: "5px",
-                      }}
-                    ></textarea>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <label htmlFor="">Supporting Document</label>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <i
-                      style={{ fontSize: "22px" }}
-                      className="fa-regular fa-image"
-                    ></i>
+                    <i className="fa-solid fa-box-open"></i>
                     <input
-                      type="file"
-                      name="pic1"
-                      id="pic1Input"
-                      accept="image/png, image/jpg, image/jpeg"
-                      onChange={(e) => handleFileChange(e, setFile, setPreviewPic1)}
+                      required
+                      type="text"
+                      placeholder="Enter Software Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                     />
-                     {previewPic1 && (
-                      <img src={previewPic1} alt="Preview 1" width="100" />
-                    )}
                   </td>
                 </tr>
+                <tr>
+                  <td>
+                    <label>Software Purpose</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                  <i className="fa-solid fa-lightbulb"></i>
+
+                    <input
+                      required
+                      type="text"
+                      placeholder="Enter Software Purpose"
+                      value={software_purpose}
+                      onChange={(e) => setSoftware_purpose(e.target.value)}
+                    />
+                  </td>
+                </tr>      
+                <tr>
+                  <td>
+                    <label>Software Version</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <i className="fa-solid fa-code-branch"></i>
+                    <input
+                      required
+                      type="text"
+                      placeholder="Enter Software Version"
+                      value={version}
+                      onChange={(e) => setVersion(e.target.value)}
+                    />
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>Expected Duration</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <i className="fa-solid fa-file-contract"></i>
+                    <select
+                      value={expected_duration}
+                      onChange={(e) => setExpected_duration(e.target.value)}
+                      required
+                    >
+                      <option style={{ color: "#9ea3ae" }} value="">
+                        Select Expected Duration
+                      </option>
+                      <option value="6 Month">6 Month</option>
+                      <option value="1 Year">1 Year</option>
+                      <option value="More Than 1 Year">More Than 1 Year</option>
+                    </select>
+                  </td>
+                </tr>
+
+
+              
+
                 <tr>
                   <td className="button">
                     <button className="submit" type="submit" disabled={loading}>
                       {loading ? (
                         <span className="loading loading-spinner"></span>
                       ) : (
-                        "Submit"
+                        "Add Software"
                       )}
                     </button>
                     <input
@@ -265,11 +242,11 @@ const Request_issue_form = () => {
                       value="Cancel"
                       onClick={() => {
                         setAssignedLaptopId("");
-                        setType("");
-                        setDescription("");
-                        setAssetType("");
-                        setFile(null);  
-                        setPreviewPic1(null);
+                        setName("");
+                        setVersion("");
+                        setSoftware_purpose("")
+                        setAssetType("")
+                        setExpected_duration("");
                       }}
                     />
                   </td>
@@ -283,4 +260,4 @@ const Request_issue_form = () => {
   );
 };
 
-export default Request_issue_form;
+export default Request_software;

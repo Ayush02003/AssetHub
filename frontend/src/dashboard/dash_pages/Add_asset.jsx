@@ -195,7 +195,7 @@ const Add_asset = () => {
                 </tr>
                 <tr>
                   <td>
-                    <label htmlFor="">Description</label>
+                    <label htmlFor="">Specifications</label>
                   </td>
                 </tr>
 
@@ -213,7 +213,7 @@ const Add_asset = () => {
                           required
                           type="text"
                           name={field}
-                          placeholder={`Enter ${field}`}
+                          placeholder={`Specify ${field}`}
                           value={fieldValues[field] || ""}
                           onChange={(e) =>
                             setFieldValues({
@@ -383,6 +383,7 @@ const Add_asset = () => {
                         setName("");
                         setType("");
                         setOtherDesc("");
+                        setFieldValues({});
                         setBrand("");
                         setPurchase_date("");
                         setWarranty_exp("");

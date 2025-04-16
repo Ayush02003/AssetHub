@@ -241,6 +241,9 @@
                 transform: scale(1.1);
                 cursor: pointer;
               }
+              &.expired {
+                background-color: #757575; 
+              }
             }
           }
 

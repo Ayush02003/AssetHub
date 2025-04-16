@@ -223,6 +223,9 @@
   transform: scale(1.1);
   cursor: pointer;
 }
+.main-noti-detail .asset-software-detail .asset-data table td .software-bubbles .software-bubble.expired {
+  background-color: #757575;
+}
 .main-noti-detail .asset-software-detail .asset-data table td .no-software {
   color: gray;
   font-style: italic;

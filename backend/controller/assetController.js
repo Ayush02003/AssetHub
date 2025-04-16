@@ -65,18 +65,62 @@ export const getAsset = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+export const getUserAsset = async (req, res) => {
+  try {
+    const userId = req.query.user_id;
+    const assets = [];
+
+    const allocations = await AssetAllocation.find({ user_id: userId });
+
+    for (const allocation of allocations) {
+      const asset = await Asset.findById(allocation.asset_id);
+      if (asset) {
+        assets.push(asset); 
+      }
+    }
+
+    return res.status(200).json({ assets });
+  } catch (error) {
+    console.error("Error in getUserAsset:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+export const getAssetById = async (req, res) => {
+  try {
+    const assetId = req.query.asset_id;
+    const asset = await Asset.findById(assetId);
+
+    return res.status(200).json({ asset });
+  } catch (error) {
+    console.error("Error in getAssets:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 export const allocatedAsset = async (req, res) => {
   try {
     const { requestId } = req.query;
-    const request = await AssetAllocation.findOne({ request_id: requestId });
+    const request = await AssetAllocation.findOne({ request_id: requestId }); 
     if (!request) {
       return res.status(404).json({ error: "Asset allocation not found." });
     }
     const asset = await Asset.findOne({ _id: request.asset_id });
-    if (!asset) {
+    if (!asset)  { 
       return res.status(404).json({ error: "Asset not found." });
     }
     return res.status(200).json({ asset });
+  } catch (error) {
+    console.error("Error in getAssets:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+export const softwareAsset = async (req, res) => {
+  try {
+    const { assetId } = req.query;
+    const asset = await Asset.findOne({ _id: assetId });
+    if (!asset)  {
+      return res.status(404).json({ error: "Asset not found." });
+    } 
+    return res.status(200).json({ asset }); 
   } catch (error) {
     console.error("Error in getAssets:", error.message);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -182,3 +226,5 @@ export const updateSoftware = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+

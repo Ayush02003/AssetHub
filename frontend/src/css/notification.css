@@ -97,8 +97,14 @@
 .user-main-noti .lower-component .inner-component .icon.asset-request {
   background: #007bff;
 }
-.user-main-noti .lower-component .inner-component .icon.warning {
+.user-main-noti .lower-component .inner-component .icon.software-expiry {
   background: #f44336;
+}
+.user-main-noti .lower-component .inner-component .icon.asset-issue-request {
+  background: #ff7777;
+}
+.user-main-noti .lower-component .inner-component .icon.software-request {
+  background: #ff9800;
 }
 .user-main-noti .lower-component .inner-component .icon.info {
   background: #007bff;
@@ -147,6 +153,10 @@
   background: #d4edda;
   color: #155724;
 }
+.user-main-noti .lower-component .inner-component .status p.software_installed {
+  background: #d4edda;
+  color: #155724;
+}
 .user-main-noti .lower-component .inner-component .status p.pending {
   background: #ffeeba;
   color: #856404;
@@ -158,6 +168,14 @@
 .user-main-noti .lower-component .inner-component .status p.rejected {
   background: #f8d7da;
   color: #721c24;
+}
+.user-main-noti .lower-component .inner-component .status p.software_expired {
+  background: #f8d7da;
+  color: #721c24;
+}
+.user-main-noti .lower-component .inner-component .status p.software_request {
+  background-color: #fcebee;
+  color: #a61c3c;
 }
 .user-main-noti .lower-component .inner-component .time {
   width: 15%;
@@ -183,6 +201,22 @@
   background-color: #007bff;
   border-radius: 50%;
   animation: glow 1s infinite alternate ease-in-out;
+}
+
+.software-expiry.unread-notification .icon::after {
+  background-color: #f44336;
+}
+
+.software-request.unread-notification .icon::after {
+  background-color: #ff9800;
+}
+
+.software-request.unread-notification .icon::after {
+  background-color: #ff9800;
+}
+
+.asset-issue-request.unread-notification .icon::after {
+  background-color: #ff7777;
 }
 
 @keyframes glow {

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import useUserStore from "../../../zustand/useUserStore.js";
 import useAssetStore from "../../../zustand/useAssetStore.js";
 import "../../../css/asset_detail.css";
 import toast from "react-hot-toast";
-
+import axios from "axios";
 const Asset_detail = () => {
   const { selectedUser, allocatedAssetUserByAssetId } = useUserStore();
   const {
@@ -13,8 +13,31 @@ const Asset_detail = () => {
     fetchInstalledSoftware,
     installedSoftware,
     updateSoftware,
+    viewAsset,
   } = useAssetStore();
   const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const assetId = queryParams.get("id");
+  useEffect(() => {
+    const fetchAsset = async () => {
+      try {
+        const res = await axios.get(
+          `/api/asset/get_asset_by_id?asset_id=${assetId}`
+        );
+        viewAsset(res.data.asset);
+        fetchInstalledSoftware(assetId);
+      } catch (e) {
+        toast.error("Failed to fetch asset details." + e);
+      }
+    };
+
+    if (assetId) {
+      fetchAsset();
+    }
+  }, [assetId]);
 
   const [assetData, setAssetData] = useState({
     id: "",
@@ -98,13 +121,13 @@ const Asset_detail = () => {
       return;
     }
     await updateAsset(assetData);
-    // toast.success("Asset updated successfully!");
   };
   const today = new Date().toISOString().split("T")[0];
   const handleSoftwareSave = async (e) => {
     e.preventDefault();
     if (
-      (softwareData.license_type === "Paid" || softwareData.license_type === "Trial") &&
+      (softwareData.license_type === "Paid" ||
+        softwareData.license_type === "Trial") &&
       (!softwareData.license_key || !softwareData.expiration_date)
     ) {
       toast.error(
@@ -133,7 +156,6 @@ const Asset_detail = () => {
   if (!selectedAsset) {
     return <p>Loading asset details...</p>;
   }
-
   return (
     <div className="main-noti-detail">
       <div className="title-container">
@@ -187,38 +209,38 @@ const Asset_detail = () => {
         {/* <hr /> */}
 
         {selectedUser && (
-          <NavLink to="/dashboard/users/user_detail"   key={selectedUser._id}>
-          <div className="laptop-data">
-            <img
-              style={{
-                width: "45px",
-                height: "45px",
-                borderRadius: "50%",
-                objectFit: "contain",
-                border: "2px solid #ddd",
-              }}
-              src={`https://avatar.iran.liara.run/public/boy`}
-              alt="User Avatar"
-            />
-            <input
-              type="text"
-              readOnly
-              value={selectedUser?.name || "N/A"}
-              placeholder="Name"
-            />
-            <input
-              type="text"
-              readOnly
-              value={selectedUser?.email || "N/A"}
-              placeholder="Email"
-            />
-            <input
-              type="text"
-              readOnly
-              value={selectedUser?.designation || "N/A"}
-              placeholder="Designation"
-            />
-          </div>
+          <NavLink to="/dashboard/users/user_detail" key={selectedUser._id}>
+            <div className="laptop-data">
+              <img
+                style={{
+                  width: "45px",
+                  height: "45px",
+                  borderRadius: "50%",
+                  objectFit: "contain",
+                  border: "2px solid #ddd",
+                }}
+                src={`https://avatar.iran.liara.run/public/boy`}
+                alt="User Avatar"
+              />
+              <input
+                type="text"
+                readOnly
+                value={selectedUser?.name || "N/A"}
+                placeholder="Name"
+              />
+              <input
+                type="text"
+                readOnly
+                value={selectedUser?.email || "N/A"}
+                placeholder="Email"
+              />
+              <input
+                type="text"
+                readOnly
+                value={selectedUser?.designation || "N/A"}
+                placeholder="Designation"
+              />
+            </div>
           </NavLink>
         )}
       </div>
@@ -322,15 +344,23 @@ const Asset_detail = () => {
                 <td>
                   {installedSoftware.length > 0 ? (
                     <div className="software-bubbles">
-                      {installedSoftware.map((software, index) => (
-                        <span
-                          key={index}
-                          onClick={() => handleSoftwareClick(software)}
-                          className="software-bubble"
-                        >
-                          {software.name}
-                        </span>
-                      ))}
+                      {installedSoftware.map((software, index) => {
+                        const isExpired =
+                          software.expiration_date &&
+                          new Date(software.expiration_date) < new Date();
+
+                        return (
+                          <span
+                            key={index}
+                            onClick={() => handleSoftwareClick(software)}
+                            className={`software-bubble ${
+                              isExpired ? "expired" : ""
+                            }`}
+                          >
+                            {software.name}
+                          </span>
+                        );
+                      })}
                     </div>
                   ) : (
                     <span className="no-software">No Software Installed</span>
@@ -362,7 +392,7 @@ const Asset_detail = () => {
                   <td>License Type:</td>
                   <td>
                     <select
-                    name="license_type"
+                      name="license_type"
                       value={softwareData.license_type}
                       onChange={handleSoftwareChange}
                       required

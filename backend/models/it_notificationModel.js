@@ -9,7 +9,12 @@ const notificationSchema = new mongoose.Schema(
     },
     requestId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: false,
+    },
+    assetId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Asset",
+      required: false,
     },
     type: {
       type: String,

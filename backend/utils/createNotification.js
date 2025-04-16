@@ -27,6 +27,7 @@ export const createHRNotification = async ({
 
 export const createITNotification = async ({
   receiverId,
+  assetId,
   requestId,
   type,
   message,
@@ -35,6 +36,7 @@ export const createITNotification = async ({
   try {
     const notification = new IT_Notification({
       receiverId,
+      assetId,
       requestId,
       type,
       message,
@@ -50,6 +52,7 @@ export const createITNotification = async ({
 
 export const createEmployeeNotification = async ({
   receiverId,
+  assetId,
   requestId,
   type,
   message,
@@ -59,6 +62,7 @@ export const createEmployeeNotification = async ({
   try {
     const notification = new Employee_Notification({
       receiverId,
+      assetId,
       requestId,
       type,
       message,

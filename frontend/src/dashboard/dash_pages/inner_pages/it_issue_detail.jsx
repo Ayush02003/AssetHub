@@ -9,7 +9,7 @@ import useAssetStore from "../../../zustand/useAssetStore.js";
 import "../../../css/notification_details.css";
 import Swal from "sweetalert2";
 import { NavLink } from "react-router-dom";
-const IT_Notification_detail = () => {
+const IT_issue_detail = () => {
   const { authUser } = useAuthContext();
   const { selectedUser, fetchUsers, users, viewUser } = useUserStore();
   const [showPending, setShowPending] = useState(false);
@@ -30,7 +30,7 @@ const IT_Notification_detail = () => {
     assets,
     installedSoftware,
     fetchInstalledSoftware,
-    allocatedAsset,
+    // allocatedAsset,
     softwareAsset,
     selectedAsset,
     viewAsset,
@@ -71,10 +71,8 @@ const IT_Notification_detail = () => {
   useEffect(() => {
     fetchUsers();
     fetchAssets();
-    if (selectedRequest?.name) {
+    if (selectedRequest) {
       softwareAsset(selectedRequest?.asset_id);
-    } else {
-      allocatedAsset(selectedRequest?._id);
     }
   }, [selectedRequest]);
 
@@ -148,10 +146,10 @@ const IT_Notification_detail = () => {
       <div className="title-container">
         <i onClick={() => navigate(-1)} className="fa fa-arrow-left"></i>
         <p>
-          {selectedRequest?.name ? (
-            <span>Software Request</span>
+          {selectedRequest.type === "maintenance" ? (
+            <span>Maintenance Request</span>
           ) : (
-            <span>Asset Request</span>
+            <span>Lost Report</span>
           )}
         </p>
       </div>
@@ -169,25 +167,20 @@ const IT_Notification_detail = () => {
       <div className="available-laptop">
         {selectedAsset ? (
           <p>
-            {selectedRequest.name ? (
-              `${selectedAsset.type} for Software Installation`
+            {selectedRequest.type === "maintenance" ? (
+              `${selectedAsset.type} for Maintenance`
             ) : (
               <>
-                <i className="fa fa-laptop"></i> Allocated{" "}
-                {selectedRequest.assetType}
+                <i className="fa fa-laptop"></i>
+                Lost {selectedAsset.type}
               </>
             )}
           </p>
         ) : (
           <p>
-            {selectedRequest.name ? (
-              "Asset for Software Installation"
-            ) : (
-              <>
-                <i className="fa fa-laptop"></i> Available{" "}
-                {selectedRequest.assetType}
-              </>
-            )}
+            <>
+              <i className="fa fa-laptop"></i> Asset Not Found
+            </>
           </p>
         )}
         <hr />
@@ -284,53 +277,55 @@ const IT_Notification_detail = () => {
         <div className="request-detail">
           <table>
             <tbody>
-              {selectedRequest?.name ? (
-                <>
-                  <tr>
-                    <td>Software Name:</td>
-                    <td>{selectedRequest?.name || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Version:</td>
-                    <td>{selectedRequest?.version || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Software Purpose:</td>
-                    <td>{selectedRequest?.softwarePurpose || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Expected Duration:</td>
-                    <td>{selectedRequest?.expectedDuration || "N/A"}</td>
-                  </tr>
-                </>
-              ) : (
-                <>
-                  <tr>
-                    <td>Asset Type:</td>
-                    <td>{selectedRequest?.assetType || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Specification:</td>
-                    <td>{selectedRequest?.specifications || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Software Requirements:</td>
-                    <td>{selectedRequest?.softwareRequirements || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Need:</td>
-                    <td>{selectedRequest?.assetNeed || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Expected Duration:</td>
-                    <td>{selectedRequest?.expectedDuration || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Required At:</td>
-                    <td>{selectedRequest?.address || "N/A"}</td>
-                  </tr>
-                </>
+              <tr>
+                <td>Description:</td>
+                <td>{selectedRequest?.description || "N/A"}</td>
+              </tr>
+
+              {selectedRequest?.type === "lost" && (
+                <tr>
+                  <td>Lost Date:</td>
+                  <td>
+                    {selectedRequest?.lost_date
+                      ? new Date(selectedRequest.lost_date).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )
+                      : "N/A"}
+                  </td>
+                </tr>
               )}
+
+              <tr>
+                <td>Supporting Document:</td>
+                <td>
+                  {selectedRequest?.file ? (
+                    <a
+                      href={selectedRequest.file}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={selectedRequest.file}
+                        alt="Preview"
+                        style={{
+                          height: "80px",
+                          objectFit: "cover",
+                          cursor: "pointer",
+                          borderRadius: "5px",
+                          boxShadow: "0px 0px 2px gray",
+                        }}
+                      />
+                    </a>
+                  ) : (
+                    "N/A"
+                  )}
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -376,7 +371,7 @@ const IT_Notification_detail = () => {
           </>
         ) : selectedRequest.requestStatus === "Software_Installed" ? (
           <button className="approve-btn" style={{ width: "60%" }}>
-           Software Installed By You
+            Software Installed By You
           </button>
         ) : (
           <button className="approve-btn" style={{ width: "60%" }}>
@@ -388,4 +383,4 @@ const IT_Notification_detail = () => {
   );
 };
 
-export default IT_Notification_detail;
+export default IT_issue_detail;

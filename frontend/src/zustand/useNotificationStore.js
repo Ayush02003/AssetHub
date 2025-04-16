@@ -11,7 +11,9 @@ const useNotificationStore = create((set,get) => {
     rejectionReason : null,
     pendingReason : null,
     requests : [],
+    
     fetchNotifications: async (userId,role) => {
+      
       try {
         const res = await axios.post(`/api/notification/get_notification`,{userId,role});          
         set({ notifications: res.data.notifications, requests: res.data.requests });
@@ -58,10 +60,34 @@ const useNotificationStore = create((set,get) => {
         toast.error(error.response?.data?.error || "Failed to reject request");
       }
     }, 
-    assetPending : async(userId, reason) => {
+    softwareReject : async(userId, reason) => {
       try {
         const { selectedRequest} = get();
+        await axios.post(`/api/notification/software_reject`,{
+          requestId: selectedRequest._id, requested_by : selectedRequest.requested_by,
+          reason, rejected_by : userId});          
+          await get().fetchNotifications(userId);
+      } catch (error) {
+        toast.error(error.response?.data?.error || "Failed to reject request");
+      }
+    }, 
+    assetPending : async(userId, reason) => {
+      try {
+        
+        const { selectedRequest} = get();
         await axios.post(`/api/notification/asset_pending`,{
+          requestId: selectedRequest._id, requested_by : selectedRequest.requested_by,
+          reason, pending_by : userId});          
+          await get().fetchNotifications(userId);
+      } catch (error) {
+        toast.error(error.response?.data?.error || "Failed to reject request");
+      }
+    }, 
+    softwarePending : async(userId, reason) => {
+      try {
+        
+        const { selectedRequest} = get();
+        await axios.post(`/api/notification/software_pending`,{
           requestId: selectedRequest._id, requested_by : selectedRequest.requested_by,
           reason, pending_by : userId});          
           await get().fetchNotifications(userId);
@@ -80,6 +106,7 @@ const useNotificationStore = create((set,get) => {
     },
     getPending : async(request_id) => {
       try {
+        // toast.error("hi")
         const res = await axios.post(`/api/notification/get_pending`,{
            requestId: request_id});  
            set({ pendingReason: res.data.request?.pending_reason || null });
@@ -97,11 +124,31 @@ const useNotificationStore = create((set,get) => {
         toast.error(error.response?.data?.error || "Failed to fetch notifications");
       }
     },
+    softwareApprove : async(userId) => { 
+      try {
+        const { selectedRequest} = get();
+        await axios.post(`/api/notification/software_approve`,{
+          requestId: selectedRequest._id, requested_by : selectedRequest.requested_by});          
+          await get().fetchNotifications(userId);
+      } catch (error) {
+        toast.error(error.response?.data?.error || "Failed to fetch notifications");
+      }
+    },
     assetAllocate_IT : async(userId,assetId) => {
       try {
         const { selectedRequest} = get();
         await axios.post(`/api/notification/asset_allocate_it`,{
           requestId: selectedRequest._id, requested_by : selectedRequest.requested_by, asset_id : assetId, user_id : userId});          
+          await get().fetchNotifications(userId);
+      } catch (error) {
+        toast.error(error.response?.data?.error || "Failed to fetch notifications");
+      }
+    },
+    softwareAllocate_IT : async(userId) => {
+      try {
+        const { selectedRequest} = get();
+        await axios.post(`/api/notification/software_allocate_it`,{
+          requestId: selectedRequest._id, requested_by : selectedRequest.requested_by, user_id : userId});          
           await get().fetchNotifications(userId);
       } catch (error) {
         toast.error(error.response?.data?.error || "Failed to fetch notifications");

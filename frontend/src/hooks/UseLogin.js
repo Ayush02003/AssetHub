@@ -9,7 +9,7 @@ const useLogin = () => {
     const {setAuthUser} = useAuthContext()
 
   const login = async(username, password, role) =>{
-    console.log(username+""+role+""+password)
+    // console.log(username+""+role+""+password)
     const success = handleInputErrors({username,password})
     if(!success) return;
     setLoading(true)

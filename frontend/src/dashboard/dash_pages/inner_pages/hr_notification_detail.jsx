@@ -16,12 +16,14 @@ const HR_Notification_detail = () => {
     selectedNotification,
     selectedRequest,
     assetApprove_HR,
+    softwareApprove,
     fetchNotifications,
     assetReject,
     getRejection,
     getPending,
     pendingReason,
     rejectionReason,
+    softwareReject,
   } = useNotificationStore();
   const [showRejection, setShowRejection] = useState(false);
   const [rejection_Reason, setRejectionReason] = useState("");
@@ -30,18 +32,24 @@ const HR_Notification_detail = () => {
     fetchInstalledSoftware,
     allocatedAsset,
     selectedAsset,
+    softwareAsset,
     viewAsset,
   } = useAssetStore();
 
   const navigate = useNavigate();
   useEffect(() => {
     if (selectedRequest?.requestStatus === "Rejected") {
-      getRejection(selectedRequest._id);
+      if (selectedRequest.name) {
+        setRejectionReason(selectedRequest.rejection_reason);
+      } else {
+        getRejection(selectedRequest._id);
+      }
       setShowRejection("true");
     }
     if (selectedRequest?.requestStatus === "Pending_By_IT") {
-      
-      getPending(selectedRequest._id);
+      // if (!selectedRequest.name) {
+        getPending(selectedRequest._id);
+      // }
     }
   }, [selectedRequest]);
   useEffect(() => {
@@ -50,7 +58,9 @@ const HR_Notification_detail = () => {
       selectedRequest?._id &&
       selectedRequest.requestStatus === "Asset_Allocated"
     ) {
-      allocatedAsset(selectedRequest._id);
+      allocatedAsset(selectedRequest?._id);
+    } else if (selectedRequest?.name) {
+      softwareAsset(selectedRequest?.asset_id);
     }
   }, [selectedRequest]);
 
@@ -73,9 +83,9 @@ const HR_Notification_detail = () => {
     setShowRejection(true);
   };
   const handleRejected = async () => {
-    if(!rejection_Reason){
-      toast.error("Please Give Reason")
-      return
+    if (!rejection_Reason) {
+      toast.error("Please Give Reason");
+      return;
     }
     Swal.fire({
       title: "Are you sure?",
@@ -86,7 +96,11 @@ const HR_Notification_detail = () => {
       cancelButtonText: "No, cancel",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await assetReject(authUser.id, rejection_Reason);
+        if (selectedRequest.name) {
+          await softwareReject(authUser._id, rejection_Reason);
+        } else {
+          await assetReject(authUser.id, rejection_Reason);
+        }
         await fetchNotifications(authUser.id);
         Swal.fire("Success!", "Request rejected successfully.", "success");
       }
@@ -95,14 +109,18 @@ const HR_Notification_detail = () => {
   const handleApprove = async () => {
     Swal.fire({
       title: "Are you sure?",
-      text: "Do you want to approve asset request?",
+      text: "Do you want to approve request?",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Yes, approve request!",
       cancelButtonText: "No, cancel",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await assetApprove_HR(authUser.id);
+        if (selectedRequest.name) {
+          await softwareApprove(authUser.id);
+        } else {
+          await assetApprove_HR(authUser.id);
+        }
         await fetchNotifications(authUser.id);
         Swal.fire("Success!", "Request approved successfully.", "success");
       }
@@ -114,92 +132,137 @@ const HR_Notification_detail = () => {
       <div className="title-container">
         <i onClick={() => navigate(-1)} className="fa fa-arrow-left"></i>
         <p>
-          <span>Asset Request</span>
+          {selectedRequest?.name ? (
+            <span>Software Request</span>
+          ) : (
+            <span>Asset Request</span>
+          )}
         </p>
       </div>
       <hr />
-        <NavLink to="/dashboard/users/user_detail">
-      <div className="user-detail">
-        <img src={`https://avatar.iran.liara.run/public/boy`} alt="" />
-        <div className="user-info" >
-          <p>{selectedUser?.name || "N/A"}</p>
-          <p>{selectedUser?.department || "N/A"}</p>
-          <p>{selectedUser?.designation || "N/A"}</p>
-        </div>
-      </div>
-        </NavLink>
-      {selectedAsset && selectedRequest.requestStatus === "Asset_Allocated" && (
-        <>
-          <div className="available-laptop">
-            <p>
-              <i className="fa fa-laptop"></i> Allocated Laptop
-            </p>
-            <hr />
-            <NavLink to="/dashboard/total_asset/asset_detail"  key={selectedAsset._id}>
-            <div className="laptop-data" onClick={() => viewAsset(selectedAsset)}>
-            <img src={selectedAsset.pic1} alt="" />
-              <input
-                type="text"
-                readOnly
-                value={selectedAsset.name}
-                placeholder="Specifications"
-              />
-              <input
-                type="text"
-                readOnly
-                value={selectedAsset.desc}
-                placeholder="Specifications"
-              />
-
-              <input
-                type="text"
-                readOnly
-                value={
-                  installedSoftware.length > 0
-                    ? installedSoftware
-                        .map((software) => software.name)
-                        .join(", ")
-                    : "No Installed Software"
-                }
-                placeholder="Software"
-              />
-            </div>
-            </NavLink>
+      <NavLink to="/dashboard/users/user_detail">
+        <div className="user-detail">
+          <img src={`https://avatar.iran.liara.run/public/boy`} alt="" />
+          <div className="user-info">
+            <p>{selectedUser?.name || "N/A"}</p>
+            <p>{selectedUser?.department || "N/A"}</p>
+            <p>{selectedUser?.designation || "N/A"}</p>
           </div>
-        </>
-      )}
+        </div>
+      </NavLink>
+      {selectedAsset &&
+        (selectedRequest.requestStatus === "Asset_Allocated" ||
+          selectedRequest.name) && (
+          <>
+            <div className="available-laptop">
+              <p>
+                <i className="fa fa-laptop"></i>
+                {selectedRequest.name
+                  ? "Allocated Laptop"
+                  : "Laptop for Software Installation"}
+              </p>
+              <hr />
+              <NavLink
+                to="/dashboard/total_asset/asset_detail"
+                key={selectedAsset._id}
+              >
+                <div
+                  className="laptop-data"
+                  onClick={() => viewAsset(selectedAsset)}
+                >
+                  <img src={selectedAsset.pic1} alt="" />
+                  <input
+                    type="text"
+                    readOnly
+                    value={selectedAsset.name}
+                    placeholder="Specifications"
+                  />
+                  <input
+                    type="text"
+                    readOnly
+                    value={selectedAsset.desc}
+                    placeholder="Specifications"
+                  />
+
+                  <input
+                    type="text"
+                    readOnly
+                    value={
+                      installedSoftware.length > 0
+                        ? installedSoftware
+                            .map((software) => software.name)
+                            .join(", ")
+                        : "No Installed Software"
+                    }
+                    placeholder="Software"
+                  />
+                  <input
+                    type="text"
+                    readOnly
+                    value={selectedAsset.serial_num}
+                    placeholder="Specifications"
+                  />
+                </div>
+              </NavLink>
+            </div>
+          </>
+        )}
       <div className="user-rejection">
         <div className="request-detail">
           <table>
             <tbody>
-              <tr>
-                <td>Asset Type:</td>
-                <td>{selectedRequest?.assetType || "N/A"}</td>
-              </tr>
-              <tr>
-                <td>Specification:</td>
-                <td>{selectedRequest?.specifications || "N/A"}</td>
-              </tr>
-              <tr>
-                <td>Software Requirements:</td>
-                <td>{selectedRequest?.softwareRequirements || "N/A"}</td>
-              </tr>
-              <tr>
-                <td>Need:</td>
-                <td>{selectedRequest?.assetNeed || "N/A"}</td>
-              </tr>
-              <tr>
-                <td>Expected Duration:</td>
-                <td>{selectedRequest?.expectedDuration || "N/A"}</td>
-              </tr>
-              <tr>
-                <td>Required At:</td>
-                <td>{selectedRequest?.address || "N/A"}</td>
-              </tr>
+              {selectedRequest?.name ? (
+                <>
+                  <tr>
+                    <td>Software Name:</td>
+                    <td>{selectedRequest?.name || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Version:</td>
+                    <td>{selectedRequest?.version || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Software Purpose:</td>
+                    <td>{selectedRequest?.softwarePurpose || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Expected Duration:</td>
+                    <td>{selectedRequest?.expectedDuration || "N/A"}</td>
+                  </tr>
+                </>
+              ) : (
+                <>
+                  <tr>
+                    <td>Asset Type:</td>
+                    <td>{selectedRequest?.assetType || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Specification:</td>
+                    <td>{selectedRequest?.specifications || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Software Requirements:</td>
+                    <td>{selectedRequest?.softwareRequirements || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Need:</td>
+                    <td>{selectedRequest?.assetNeed || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Expected Duration:</td>
+                    <td>{selectedRequest?.expectedDuration || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Required At:</td>
+                    <td>{selectedRequest?.address || "N/A"}</td>
+                  </tr>
+                </>
+              )}
             </tbody>
           </table>
         </div>
-        {pendingReason && selectedRequest.requestStatus === "Pending_By_IT" && (
+
+        {(pendingReason) && selectedRequest.requestStatus === "Pending_By_IT" && (
           <>
             <div className="rejection-detail">
               <p style={{ color: "#f9a825", borderLeft: "4px solid #f9a825" }}>
@@ -218,11 +281,14 @@ const HR_Notification_detail = () => {
         {showRejection &&
           selectedRequest.requestStatus !== "Approved_By_HR" && (
             <div className="rejection-detail">
-              {rejectionReason ? (
+              {rejectionReason || rejection_Reason ? (
                 <>
                   <p>Rejection Reason</p>
-                  <textarea 
-                  style={{backgroundColor: "#ffccbc"}} value={rejectionReason} readOnly></textarea>
+                  <textarea
+                    style={{ backgroundColor: "#ffccbc" }}
+                    value={rejectionReason || rejection_Reason}
+                    readOnly
+                  ></textarea>
                 </>
               ) : (
                 <>
@@ -253,24 +319,25 @@ const HR_Notification_detail = () => {
           <button className="reject-btn" style={{ width: "60%" }}>
             Request Rejected By You
           </button>
-        ) :selectedRequest.requestStatus === "Asset_Allocated" ? (
+        ) : selectedRequest.requestStatus === "Asset_Allocated" ? (
           <button className="approve-btn" style={{ width: "60%" }}>
             Asset Allocated
           </button>
-        ) : 
-          selectedRequest.requestStatus === "Approved_By_HR" ? (
-            <button className="approve-btn" style={{ width: "60%" }}>
-              Request Approved By You
-            </button>
-        ) :
-        (
+        ): selectedRequest.requestStatus === "Software_Installed" ? (
+          <button className="approve-btn" style={{ width: "60%" }}>
+            Software Installed By IT-Person
+          </button>
+        ) : selectedRequest.requestStatus === "Approved_By_HR" ? (
+          <button className="approve-btn" style={{ width: "60%" }}>
+            Request Approved By You
+          </button>
+        ) : (
           selectedRequest.requestStatus === "Pending_By_IT" && (
             <button className="pending-btn" style={{ width: "60%" }}>
               Allocation Pending By IT_Person
             </button>
           )
-        ) 
-        }
+        )}
       </div>
     </div>
   );

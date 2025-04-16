@@ -69,14 +69,14 @@ const Login = () => {
             </select>
           </div>
           <a
-            href="#"
+            href="/forget_password"
             className="text-xs text-gray-600 hover:underline hover:text-blue-600"
           >
             Forget Password?
           </a>
           <div>
             <button
-              className="btn btn-block btn-sm mt-3 text-white "
+              className="btn btn-block btn-sm mt-2 text-white "
               disabled={loading}
             >
               {loading ? (

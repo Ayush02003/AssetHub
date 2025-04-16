@@ -3,9 +3,12 @@ import IT_Notification from "../models/it_notificationModel.js";
 import AssetRejection from "../models/assetRejectionModel.js";
 import Employee_Notification from "../models/employee_notificationModel.js";
 import AssetRequest from "../models/assetRequestModel.js";
+import SoftwareRequest from "../models/softwareRequestModel.js";
+import AssetIssue from "../models/assetIssueModel.js";
 import Asset from "../models/assetModel.js";
 import Employee from "../models/employeeModel.js";
 import AssetAllocation from "../models/assetAllocationModel.js";
+import Software from "../models/softwareModel.js";
 import moment from "moment";
 import {
   createITNotification,
@@ -15,6 +18,7 @@ export const getNotification = async (req, res) => {
   try {
     const { userId, role } = req.body;
     let notificationModel;
+
     if (role === "HR") {
       notificationModel = HR_Notification;
     } else if (role === "IT-Person") {
@@ -24,15 +28,25 @@ export const getNotification = async (req, res) => {
     }
 
     const notifications = await notificationModel.find({ receiverId: userId });
-    const requestIds = notifications.map((notif) => notif.requestId);
-    const requests = await AssetRequest.find({ _id: { $in: requestIds } });
 
-    return res.status(200).json({ notifications, requests });
+    const requestIds = notifications.map((notif) => notif.requestId);
+
+    const [assetRequests, softwareRequests, assetIssues] = await Promise.all([
+      AssetRequest.find({ _id: { $in: requestIds } }),
+      SoftwareRequest.find({ _id: { $in: requestIds } }),
+      AssetIssue.find({ _id: { $in: requestIds } }),
+    ]);
+
+    const combinedRequests = [...assetRequests, ...softwareRequests, ...assetIssues];
+
+    return res.status(200).json({ notifications, requests: combinedRequests });
+
   } catch (error) {
     console.error("Error in getNotification:", error.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 export const asset_Approve_HR = async (req, res) => {
   try {
@@ -79,6 +93,61 @@ export const asset_Approve_HR = async (req, res) => {
       requestId: request._id,
       type: "Asset Request",
       message: "Your asset request has been approved by HR",
+      status: "unread",
+    });
+
+    return res.status(200).json({ request });
+  } catch (error) {
+    console.error("Error in getNotifications:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const software_Approve = async (req, res) => {
+  try {
+    const { requestId, requested_by } = req.body;
+    const request = await SoftwareRequest.findById({ _id: requestId });
+    const user = await Employee.findById(requested_by);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    let itUsers = await Employee.find({
+      department: user.department,
+      designation: "IT-Person",
+    });
+
+    if (itUsers.length === 0) {
+      itUsers = await Employee.find({
+        department: "All",
+        designation: "IT-Person",
+      });
+    }
+    if (itUsers.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No IT Person found to process this request" });
+    }
+
+    request.requestStatus = "Approved_By_HR";
+    request.save();
+    await Promise.all(
+      itUsers.map((it) =>
+        createITNotification({
+          receiverId: it._id,
+          requestId: request._id,
+          type: "Software Request",
+          message: `Provide requested Software to ${user.name}`,
+          status: "unread",
+        })
+      )
+    );
+    const employeeNotification = createEmployeeNotification({
+      receiverId: user._id,
+      requestId: request._id,
+      type: "Software Request",
+      message: "Your software request has been approved by HR",
       status: "unread",
     });
 
@@ -156,6 +225,39 @@ export const asset_Allocate_IT = async (req, res) => {
   }
 };
 
+export const software_Allocate_IT = async (req, res) => {
+  try { 
+    const { requestId, requested_by, user_id } = req.body;
+
+    const request = await SoftwareRequest.findById(requestId);
+    const user = await Employee.findById(requested_by);
+
+    if (!request) return res.status(404).json({ error: "Request not found" });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+
+    request.requestStatus = "Software_Installed";
+    request.allocated_by = user_id;
+    await request.save();
+
+
+    await createEmployeeNotification({
+      receiverId: user._id,
+      requestId: request._id,
+      type: "Software Request",
+      message: "Software has been installed",
+      status: "unread",
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Software installed successfully", request });
+  } catch (error) {
+    console.error("Error in asset_allocate_IT:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export const updateStatus = async (req, res) => {
   try {
     const { notId, role } = req.body;
@@ -222,7 +324,35 @@ export const asset_Reject = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+export const software_Reject = async (req, res) => {
+  try {
+    const { requestId, requested_by, reason, rejected_by } = req.body;
+    const request = await SoftwareRequest.findById({ _id: requestId });
+    const user = await Employee.findById(requested_by);
+    // const hr_user = await Employee.findById(rejected_by);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
+    request.requestStatus = "Rejected";
+    request.rejection_reason = reason;
+    request.rejected_by = rejected_by
+    request.save();
+
+    const employeeNotification = createEmployeeNotification({
+      receiverId: user._id,
+      requestId: request._id,
+      type: "Software Request",
+      message: "Your software request has been rejected by HR",
+      status: "unread",
+    });
+
+    return res.status(200).json({ request });
+  } catch (error) {
+    console.error("Error in getNotifications:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 export const get_Rejection = async (req, res) => {
   try {
     const { requestId } = req.body;
@@ -239,12 +369,15 @@ export const get_Rejection = async (req, res) => {
 };
 
 export const get_Pending = async (req, res) => {
-  try {
+  try {   
     const { requestId } = req.body;
-    const request = await AssetRequest.findOne({ _id: requestId });
+    let request = await AssetRequest.findOne({ _id: requestId });
  
     if (!request) {
+      request = await SoftwareRequest.findOne({ _id: requestId });
+      if (!request) {
       return res.status(404).json({ error: "Request not found" });
+      }
     } 
     return res.status(200).json({ request });
   } catch (error) {
@@ -268,11 +401,11 @@ export const asset_Pending = async (req, res) => {
     request.requestStatus = "Pending_By_IT";
     request.pending_by = pending_by;
     request.pending_reason = reason;
-    request.save();
+    request.save();   
     const employeeNotification = await createEmployeeNotification({
       receiverId: requested_by,
       requestId: requestId,
-      type: "Asset Request",
+      type: "Asset Request",          
       message: "Your asset request has been pending by IT-Person",
       pending_reason: reason,
       status: "unread",
@@ -283,5 +416,75 @@ export const asset_Pending = async (req, res) => {
   } catch (error) {
     console.error("Error in getNotifications:", error.message);
     return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+export const software_Pending = async (req, res) => {
+  try {
+    const { requestId, requested_by, reason, pending_by } = req.body;
+    
+    const it_user = await Employee.findById(pending_by);
+    const request = await SoftwareRequest.findById(requestId);
+    if (!it_user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    request.requestStatus = "Pending_By_IT";
+    request.pending_by = pending_by;
+    request.pending_reason = reason;
+    request.save();   
+    const employeeNotification = await createEmployeeNotification({
+      receiverId: requested_by,
+      requestId: requestId,
+      type: "Software Request",          
+      message: "Your software request has been pending by IT-Person",
+      pending_reason: reason,
+      status: "unread",
+    }); 
+    // console.log("Saved Notification:", employeeNotification);
+
+    return res.status(200).json({ request });
+  } catch (error) {
+    console.error("Error in getNotifications:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+export const checkSoftwareExpiry = async (req, res) => {
+  try {
+    const now = Date.now();
+    const today = new Date();
+    const softwares = await Software.find({ expiration_date: { $lte: today } });
+
+    for (const software of softwares) {
+      const lastNotified = software.lastExpiryNotified?.getTime();
+      // console.log(software.name)
+      if (!lastNotified || (now - lastNotified) / (1000 * 60 * 60 * 24) >= 7) {
+        software.lastExpiryNotified = new Date(now);
+        await software.save();
+
+        const asset_allocation = await AssetAllocation.findOne({ asset_id: software.assigned_laptop_id });
+
+        if (asset_allocation) {
+          await createEmployeeNotification({
+            receiverId: asset_allocation.user_id,
+            assetId: asset_allocation.asset_id,
+            type: "Software Expiry",
+            message: `Your software ${software.name} has expired`,
+            status: "unread",
+          });
+
+          await createITNotification({
+            receiverId: asset_allocation.allocated_by,
+            assetId: asset_allocation.asset_id,
+            type: "Software Expiry",
+            message: `Software ${software.name} assigned to user has expired`,
+            status: "unread",
+          });
+        }
+      }
+    }
+
+  } catch (error) {
+    console.error("Error in software expiry:", error.message);
   }
 };

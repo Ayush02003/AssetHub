@@ -1,12 +1,12 @@
 import { create } from "zustand";
 import axios from "axios";
 import toast from "react-hot-toast";
-
 const useAssetStore = create((set) => ({
   assets: [],
   selectedAsset: null,
   installedSoftware: [],
   allocatedAssets: [],
+  
   fetchAssets: async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/asset/get_asset");
@@ -15,7 +15,14 @@ const useAssetStore = create((set) => ({
       toast.error("Failed to fetch assets: " + error.message);
     }
   },
-
+  fetchUserAssets: async (user_id) => {
+    try {
+      const res = await axios.get(`http://localhost:8000/api/asset/get_user_asset?user_id=${user_id}`);
+      set({ assets: res.data.assets });
+    } catch (error) {
+      toast.error("Failed to fetch assets: " + error.message);
+    }
+  },
   viewAsset: (asset) => {
     set({ selectedAsset: asset, installedSoftware: [] });
   },
@@ -51,7 +58,22 @@ const useAssetStore = create((set) => ({
     try {
       const response = await axios.get(
         `/api/asset/allocated_asset?requestId=${requestId}`
-      );
+      );                                    
+      set(() => ({ 
+        selectedAsset: response.data.asset || null,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch asset.", error);
+      set(() => ({
+        selectedAsset: null,
+      }));
+    }
+  },
+  softwareAsset: async (assetId) => {
+    try {
+      const response = await axios.get(
+        `/api/asset/software_asset?assetId=${assetId}`
+      );                                    
       set(() => ({ 
         selectedAsset: response.data.asset || null,
       }));

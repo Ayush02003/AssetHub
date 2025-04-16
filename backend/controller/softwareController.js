@@ -60,7 +60,7 @@ export const addSoftware = async (req, res) => {
 export const getSoftware = async(req,res) =>{
 try {
   
-  const {asset_id} = req.query 
+  const {asset_id} = req.query    
   const softwares = await Software.find({assigned_laptop_id : asset_id})
   res.status(200).json({software : softwares});
 } catch (error) {

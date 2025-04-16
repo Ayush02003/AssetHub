@@ -26,6 +26,7 @@ import Notification from "./dash_pages/Notification.jsx";
 import Setting from "./dash_pages/Setting.jsx";
 import HR_Notification_detail from "./dash_pages/inner_pages/hr_notification_detail.jsx";
 import IT_Notification_detail from "./dash_pages/inner_pages/it_notification_detail.jsx";
+import IT_issue_detail from "./dash_pages/inner_pages/it_issue_detail.jsx";
 import Emp_Notification_detail from "./dash_pages/inner_pages/emp_notification_detail.jsx";
 import User_detail from "./dash_pages/inner_pages/user_detail.jsx";
 import Asset_detail from "./dash_pages/inner_pages/asset_detail.jsx";
@@ -34,7 +35,7 @@ import useLogout from "../hooks/UseLogout.js";
 import ProtectedRoute from "./protected_routes/Protected_Routes.jsx";
 import Departments from "./dash_pages/Departments.jsx";
 import Asset_type from "./dash_pages/Asset_type.jsx";
-
+import Request_software from "./dash_pages/Request_software.jsx";
 const Dash = () => {
   const location = useLocation();
   const { loading, logout } = useLogout();
@@ -244,7 +245,22 @@ const Dash = () => {
                           "inner-selected"
                         }`}
                       >
-                        Request Maintenance
+                       Asset Help
+                      </li>
+                    </NavLink>
+                  ) : (
+                    ""
+                  )}
+                     {authUser.role == "Employee" ? (
+                    <NavLink to="/dashboard/request_software">
+                      <li
+                        className={`innerComp  ${
+                          (pathname === "/request_software" ||
+                            pathname.includes("request_software")) &&
+                          "inner-selected"
+                        }`}
+                      >
+                        Request Software
                       </li>
                     </NavLink>
                   ) : (
@@ -519,10 +535,16 @@ const Dash = () => {
               />
             </Route>
             <Route
+              element={
+                <ProtectedRoute allowedRoles={["Admin", "IT-Person", "HR"]} />
+              }
+            >
+            <Route
                 exact
                 path="/total_asset/asset_detail"
                 element={authUser ? <Asset_detail /> : <Navigate to={"/"} />}
               />
+              </Route>
             <Route
               exact
               path="/profile"
@@ -533,6 +555,11 @@ const Dash = () => {
                 exact
                 path="/request_asset"
                 element={authUser ? <Request_asset /> : <Navigate to={"/"} />}
+              />
+               <Route
+                exact
+                path="/request_software"
+                element={authUser ? <Request_software /> : <Navigate to={"/"} />}
               />
               <Route
                 exact
@@ -600,6 +627,11 @@ const Dash = () => {
               exact
               path="/notification/it_notification_detail"
               element={authUser ? <IT_Notification_detail /> : <Navigate to={"/"} />}
+            />
+            <Route
+              exact
+              path="/notification/it_issue_detail"
+              element={authUser ? <IT_issue_detail /> : <Navigate to={"/"} />}
             />
             <Route
               exact

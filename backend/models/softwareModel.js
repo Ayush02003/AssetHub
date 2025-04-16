@@ -41,7 +41,11 @@ const softwareSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Employee", 
             required: true,
-        }
+        },
+        lastExpiryNotified: { 
+            type: Date, 
+            default: null, 
+          },
 
     },
     { timestamps: true }
