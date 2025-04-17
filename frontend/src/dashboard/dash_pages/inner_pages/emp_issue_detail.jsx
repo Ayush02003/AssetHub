@@ -9,7 +9,7 @@ import useAssetStore from "../../../zustand/useAssetStore.js";
 import "../../../css/notification_details.css";
 import Swal from "sweetalert2";
 import { NavLink } from "react-router-dom";
-const IT_issue_detail = () => {
+const Emp_issue_detail = () => {
   const { authUser } = useAuthContext();
   const { selectedUser, fetchUsers, users, viewUser } = useUserStore();
   const [showNotify, setShowNotify] = useState(true);
@@ -432,4 +432,4 @@ const IT_issue_detail = () => {
   );
 };
 
-export default IT_issue_detail;
+export default Emp_issue_detail;

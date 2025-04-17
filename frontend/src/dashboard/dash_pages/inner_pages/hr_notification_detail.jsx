@@ -48,7 +48,7 @@ const HR_Notification_detail = () => {
     }
     if (selectedRequest?.requestStatus === "Pending_By_IT") {
       // if (!selectedRequest.name) {
-        getPending(selectedRequest._id);
+      getPending(selectedRequest._id);
       // }
     }
   }, [selectedRequest]);
@@ -262,7 +262,7 @@ const HR_Notification_detail = () => {
           </table>
         </div>
 
-        {(pendingReason) && selectedRequest.requestStatus === "Pending_By_IT" && (
+        {pendingReason && selectedRequest.requestStatus === "Pending_By_IT" && (
           <>
             <div className="rejection-detail">
               <p style={{ color: "#f9a825", borderLeft: "4px solid #f9a825" }}>
@@ -292,6 +292,7 @@ const HR_Notification_detail = () => {
                 </>
               ) : (
                 <>
+                  <p>Rejection Reason</p>
                   <textarea
                     placeholder="Enter rejection reason..."
                     value={rejection_Reason}
@@ -323,7 +324,7 @@ const HR_Notification_detail = () => {
           <button className="approve-btn" style={{ width: "60%" }}>
             Asset Allocated
           </button>
-        ): selectedRequest.requestStatus === "Software_Installed" ? (
+        ) : selectedRequest.requestStatus === "Software_Installed" ? (
           <button className="approve-btn" style={{ width: "60%" }}>
             Software Installed By IT-Person
           </button>

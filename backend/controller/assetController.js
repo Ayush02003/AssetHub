@@ -100,6 +100,7 @@ export const allocatedAsset = async (req, res) => {
   try {
     const { requestId } = req.query;
     const request = await AssetAllocation.findOne({ request_id: requestId }); 
+    // console.log("HIi")
     if (!request) {
       return res.status(404).json({ error: "Asset allocation not found." });
     }

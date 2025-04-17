@@ -28,6 +28,7 @@ import HR_Notification_detail from "./dash_pages/inner_pages/hr_notification_det
 import IT_Notification_detail from "./dash_pages/inner_pages/it_notification_detail.jsx";
 import IT_issue_detail from "./dash_pages/inner_pages/it_issue_detail.jsx";
 import Emp_Notification_detail from "./dash_pages/inner_pages/emp_notification_detail.jsx";
+import Emp_issue_detail from "./dash_pages/inner_pages/emp_issue_detail.jsx";
 import User_detail from "./dash_pages/inner_pages/user_detail.jsx";
 import Asset_detail from "./dash_pages/inner_pages/asset_detail.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
@@ -637,6 +638,11 @@ const Dash = () => {
               exact
               path="/notification/emp_notification_detail"
               element={authUser ? <Emp_Notification_detail /> : <Navigate to={"/"} />}
+            />
+            <Route
+              exact
+              path="/notification/emp_issue_detail"
+              element={authUser ? <Emp_issue_detail /> : <Navigate to={"/"} />}
             />
             <Route
               exact

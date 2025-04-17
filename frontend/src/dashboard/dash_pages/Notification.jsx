@@ -8,16 +8,14 @@ const getIconClass = (type) => {
   switch (type.toLowerCase()) {
     case "asset request":
       return "fa fa-laptop";
-    case "maintenance request":
-      return "fa fa-wrench";
-    case "system update":
-      return "fa fa-laptop";
     case "software expiry":
       return "fa fa-clock";
     case "software request":
       return "fa fa-laptop-code";
-    case "asset issue request":
+    case "maintenance":
       return "fa fa-wrench";
+    case "lost":
+      return "fa fa-exclamation-triangle";
     default:
       return "fa fa-bell";
   }
@@ -165,10 +163,14 @@ const Notification = () => {
                       : `/dashboard/notification/${
                           authUser.role === "HR"
                             ? "hr_notification_detail"
-                            : authUser.role === "IT-Person" 
-                            ?  notif.type === "Asset Issue Request"
+                            : authUser.role === "IT-Person"
+                            ? notif.type === "Asset Issue Request"
                               ? "it_issue_detail"
                               : "it_notification_detail"
+                            : authUser.role === "Employee"
+                            ? notif.type === "Asset Issue Request"
+                              ? "emp_issue_detail"
+                              : "emp_notification_detail"
                             : "emp_notification_detail"
                         }`
                   }
@@ -195,7 +197,15 @@ const Notification = () => {
                         .replace(/\s+/g, "-")}`}
                     >
                       <i
-                        className={getIconClass(notif.type)}
+                        className={getIconClass(
+                          notif.message.toLowerCase().includes("lost")
+                            ? "lost"
+                            : notif.message
+                                .toLowerCase()
+                                .includes("maintenance")
+                            ? "maintenance"
+                            : notif.type
+                        )}
                         aria-hidden="true"
                       ></i>
                     </div>
@@ -222,6 +232,24 @@ const Notification = () => {
                             <p className="software_installed">
                               Software Installed
                             </p>
+                          ),
+                          "IT has responded to your maintenance request. View their message":
+                            <p className="approved_by_hr">Response</p>,
+                          "Your maintenance request is now being processed by IT.":
+                            (
+                              <p className="under_maintenance">
+                                Under Maintenance
+                              </p>
+                            ),
+
+                          "Your lost request is now being processed by IT.": (
+                            <p className="under_process">Under Process</p>
+                          ),
+                          "Your lost request has been rejected by IT.": (
+                            <p className="software_expired">Rejected</p>
+                          ),
+                          "Your maintenance request is resolved.": (
+                            <p className="issue_resolved">Issue Resolved</p>
                           ),
                           "Your software request has been rejected by HR": (
                             <p className="rejected">Rejected</p>

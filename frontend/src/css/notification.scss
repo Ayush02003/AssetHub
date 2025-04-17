@@ -34,10 +34,10 @@
       background: #ffffff;
       padding: 10px 0px 5px 0px;
       border-radius: 8px;
-      div{
+      div {
         width: 100%;
         position: relative;
-        i{
+        i {
           position: absolute;
           left: 15px;
           top: 50%;
@@ -58,7 +58,7 @@
           box-shadow: 0px 0px 1px gray;
         }
       }
-  
+
       input {
         flex: 1;
         padding-left: 40px;
@@ -115,7 +115,8 @@
         &.asset-issue-request {
           background: #ff7777;
         }
-        &.software-request{
+
+        &.software-request {
           background: #ff9800;
         }
         &.info {
@@ -177,25 +178,39 @@
             color: #155724;
           }
           &.pending {
-            background: #ffeeba; 
-            color: #856404; 
+            background: #ffeeba;
+            color: #856404;
           }
-        
+
           &.pending_by_it {
-            background: #ffd966; 
-            color: #7a5900; 
+            background: #ffd966;
+            color: #7a5900;
           }
           &.rejected {
             background: #f8d7da;
             color: #721c24;
+          }
+          &.issue_resolved {
+            background: #d4edda;
+            color: #155724;
+          }
+
+          &.under_maintenance {
+            background: #d1ecf1;
+            color: #0c5460;
+          }
+
+          &.under_process {
+            background: #d1ecf1;
+            color: #0c5460;
           }
           &.software_expired {
             background: #f8d7da;
             color: #721c24;
           }
           &.software_request {
-            background-color: #fcebee; 
-            color: #a61c3c; 
+            background-color: #fcebee;
+            color: #a61c3c;
           }
         }
       }
@@ -242,7 +257,7 @@
 .software-request.unread-notification .icon::after {
   background-color: #ff9800;
 }
-.asset-issue-request.unread-notification .icon::after{
+.asset-issue-request.unread-notification .icon::after {
   background-color: #ff7777;
 }
 @keyframes glow {

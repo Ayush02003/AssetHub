@@ -12,6 +12,10 @@ import {
   asset_Pending,
   software_Pending,
   get_Rejection,
+
+  issueSolved_IT,
+  issue_messages,
+  underProcess_Issue
 } from "../controller/notificationController.js";
 const router = express.Router();
 
@@ -27,6 +31,8 @@ router.post("/get_rejection", get_Rejection);
 router.post("/asset_pending", asset_Pending);
 router.post("/software_pending", software_Pending);
 router.post("/get_pending", get_Pending);
-
+router.post("/send_notification", issue_messages);
+router.post("/underProcess_IT", underProcess_Issue);
+router.post("/issueSolved_IT", issueSolved_IT);
 // router.post("/logout",logout)
 export default router;

@@ -203,7 +203,7 @@ export const addAssetIssue = async (req, res) => {
       itUsers.map((it) =>
         createITNotification({
           receiverId: it._id,
-          requestId: newAssetIssue._id,
+          requestId: newAssetIssue._id,               
           type: "Asset Issue Request",
           message: `New ${type} request from ${user.name}`,
           status: "unread",

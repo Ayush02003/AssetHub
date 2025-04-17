@@ -77,7 +77,7 @@ const useAssetStore = create((set) => ({
       set(() => ({ 
         selectedAsset: response.data.asset || null,
       }));
-    } catch (error) {
+    } catch (error) { 
       console.error("Failed to fetch asset.", error);
       set(() => ({
         selectedAsset: null,

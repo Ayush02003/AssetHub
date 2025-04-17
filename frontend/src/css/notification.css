@@ -169,6 +169,18 @@
   background: #f8d7da;
   color: #721c24;
 }
+.user-main-noti .lower-component .inner-component .status p.issue_resolved {
+  background: #d4edda;
+  color: #155724;
+}
+.user-main-noti .lower-component .inner-component .status p.under_maintenance {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+.user-main-noti .lower-component .inner-component .status p.under_process {
+  background: #d1ecf1;
+  color: #0c5460;
+}
 .user-main-noti .lower-component .inner-component .status p.software_expired {
   background: #f8d7da;
   color: #721c24;
