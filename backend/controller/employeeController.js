@@ -65,9 +65,9 @@ export const updateEmployee = async (req, res) => {
     const updatedEmployee = await Employee.findOneAndUpdate(
       { _id: updateData.id },
       { $set: updateData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true }                            
     );
-
+                                                                
     if (!updatedEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }

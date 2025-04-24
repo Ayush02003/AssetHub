@@ -14,6 +14,7 @@ import Total_asset from "./dash_pages/Total_asset.jsx";
 import Profile from "./dash_pages/Profile.jsx";
 import Request_asset from "./dash_pages/Request_asset.jsx";
 import Request_maintenance from "./dash_pages/Request_maintenance.jsx";
+import Asset_return from "./dash_pages/Asset_return.jsx";
 import Asset_allocation from "./dash_pages/Asset_allocation.jsx";
 import Add_asset from "./dash_pages/Add_asset.jsx";
 import Add_software from "./dash_pages/Add_software.jsx";
@@ -26,9 +27,12 @@ import Notification from "./dash_pages/Notification.jsx";
 import Setting from "./dash_pages/Setting.jsx";
 import HR_Notification_detail from "./dash_pages/inner_pages/hr_notification_detail.jsx";
 import IT_Notification_detail from "./dash_pages/inner_pages/it_notification_detail.jsx";
+import IT_return_detail from "./dash_pages/inner_pages/it_return_detail.jsx";
 import IT_issue_detail from "./dash_pages/inner_pages/it_issue_detail.jsx";
 import Emp_Notification_detail from "./dash_pages/inner_pages/emp_notification_detail.jsx";
 import Emp_issue_detail from "./dash_pages/inner_pages/emp_issue_detail.jsx";
+import Emp_return_detail from "./dash_pages/inner_pages/emp_return_detail.jsx";
+
 import User_detail from "./dash_pages/inner_pages/user_detail.jsx";
 import Asset_detail from "./dash_pages/inner_pages/asset_detail.jsx";
 import { useAuthContext } from "../context/AuthContext.jsx";
@@ -262,6 +266,21 @@ const Dash = () => {
                         }`}
                       >
                         Request Software
+                      </li>
+                    </NavLink>
+                  ) : (
+                    ""
+                  )}
+                   {authUser.role == "Employee" ? (
+                    <NavLink to="/dashboard/asset_return">
+                      <li
+                        className={`innerComp  ${
+                          (pathname === "/asset_return" ||
+                            pathname.includes("asset_return")) &&
+                          "inner-selected"
+                        }`}
+                      >
+                       Return Asset
                       </li>
                     </NavLink>
                   ) : (
@@ -569,6 +588,13 @@ const Dash = () => {
                   authUser ? <Request_maintenance /> : <Navigate to={"/"} />
                 }
               />
+               <Route
+                exact
+                path="/asset_return"
+                element={
+                  authUser ? <Asset_return /> : <Navigate to={"/"} />
+                }
+              />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={["Admin", "HR"]} />}>
               <Route
@@ -634,6 +660,11 @@ const Dash = () => {
               path="/notification/it_issue_detail"
               element={authUser ? <IT_issue_detail /> : <Navigate to={"/"} />}
             />
+             <Route
+              exact
+              path="/notification/it_return_detail"
+              element={authUser ? <IT_return_detail /> : <Navigate to={"/"} />}
+            />
             <Route
               exact
               path="/notification/emp_notification_detail"
@@ -643,6 +674,11 @@ const Dash = () => {
               exact
               path="/notification/emp_issue_detail"
               element={authUser ? <Emp_issue_detail /> : <Navigate to={"/"} />}
+            />
+            <Route
+              exact
+              path="/notification/emp_return_detail"
+              element={authUser ? <Emp_return_detail /> : <Navigate to={"/"} />}
             />
             <Route
               exact

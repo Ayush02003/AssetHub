@@ -17,6 +17,7 @@ import {
   assetRequest,
   assetSoftwareRequest,
   addAssetIssue,
+  addAssetReturn
 } from "../controller/requestController.js";
 const router = express.Router();
 
@@ -29,6 +30,8 @@ router.get("/get_installed_software", getSoftware);
 router.post("/add_request", assetRequest);
 router.post("/add_software_request", assetSoftwareRequest);
 router.post("/add_asset_issue", addAssetIssue);
+router.post("/asset_return", addAssetReturn);
+
 router.get("/allocated_asset", allocatedAsset);
 router.get("/software_asset", softwareAsset);
 router.get("/allocated_asset_user", allocatedAssetUser);

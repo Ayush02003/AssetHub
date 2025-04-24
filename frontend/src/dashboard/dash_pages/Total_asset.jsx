@@ -82,8 +82,12 @@ const Total_asset = () => {
             onChange={(e) => setFilterStatus(e.target.value)}
           >
             <option value="">All Status</option>
-            <option value="Assigned">Assigned</option>
-            <option value="Not Assigned">Not Assigned</option>
+            <hr />
+            {[...new Set(assets.map((asset) => asset.status))].map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
           </select>
         </div>
       </div>

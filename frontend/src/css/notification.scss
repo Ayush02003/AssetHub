@@ -13,11 +13,6 @@
     align-items: center;
     justify-content: space-between;
 
-    h2 {
-      //   font-size: 22px;
-      //   font-weight: bold;
-      //   color: #333;
-    }
     select {
       box-sizing: border-box;
       padding: 5px;
@@ -119,6 +114,9 @@
         &.software-request {
           background: #ff9800;
         }
+        &.asset-return-request {
+          background: #4dabf7;
+        }
         &.info {
           background: #007bff;
         }
@@ -169,6 +167,10 @@
             background: #cce5ff;
             color: #004085;
           }
+          &.response {
+            background: #cce5ff;
+            color: #004085;
+          }
           &.asset_allocated {
             background: #d4edda;
             color: #155724;
@@ -177,6 +179,12 @@
             background: #d4edda;
             color: #155724;
           }
+          &.return_completed {
+            background: #e6f7ff; // soft blue
+            color: #004085; // deep blue text
+            border-left: 4px solid #91d5ff; // subtle highlight
+          }
+
           &.pending {
             background: #ffeeba;
             color: #856404;
@@ -259,6 +267,9 @@
 }
 .asset-issue-request.unread-notification .icon::after {
   background-color: #ff7777;
+}
+.asset-return-request.unread-notification .icon::after {
+  background: #4dabf7;
 }
 @keyframes glow {
   from {

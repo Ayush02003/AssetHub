@@ -38,7 +38,10 @@ const IT_issue_detail = () => {
 
   useEffect(() => {
     const fetchNotification = async () => {
-      if (selectedRequest?.review_comment) {
+      if (
+        selectedRequest?.review_comment &&
+        !selectedRequest.rejection_reason
+      ) {
         setNotification(selectedRequest.review_comment);
         // setShowNotify(true);
       } else if (selectedRequest?.requestStatus === "Request Rejected") {
@@ -70,7 +73,7 @@ const IT_issue_detail = () => {
   };
 
   useEffect(() => {
-    fetchUsers(); 
+    fetchUsers();
     fetchAssets();
     if (selectedRequest) {
       softwareAsset(selectedRequest?.asset_id);
@@ -104,17 +107,17 @@ const IT_issue_detail = () => {
     Swal.fire({
       title: isMaintenance
         ? "Confirm Maintenance Resolution?"
-        : "Confirm Lost Item Resolution?",
+        : "Confirm Asset Lost?",
       text: isMaintenance
         ? "Are you sure the asset has been fixed and is ready to be used again?"
         : "Are you sure the lost item issue has been resolved or handled?",
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: isMaintenance 
+      confirmButtonText: isMaintenance
         ? "Yes, Mark as Resolved"
         : "Yes, Mark as Resolved",
       cancelButtonText: "No, Cancel",
-    }).then(async (result) => { 
+    }).then(async (result) => {
       if (result.isConfirmed) {
         await issueSolved_IT(authUser.id);
         await fetchNotifications(authUser.id);
@@ -127,6 +130,26 @@ const IT_issue_detail = () => {
         );
       }
     });
+  };
+  const handleFound = async () => {
+    const confirm = await Swal.fire({
+      title: "Confirm Asset Found?",
+      text: "Are you sure the asset has been recovered and is no longer considered lost?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Mark as Found",
+      cancelButtonText: "Cancel",
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        await issueSolved_IT(authUser.id, "Asset_Found");
+        await fetchNotifications(authUser.id);
+        toast.success("Asset marked as found and updated successfully!");
+      } catch (err) {
+        toast.error("Something went wrong while updating." + err);
+      }
+    }
   };
 
   const handleLaptopChange = (e) => {
@@ -150,7 +173,7 @@ const IT_issue_detail = () => {
           )}
         </p>
       </div>
-      <hr />  
+      <hr />
       <NavLink to="/dashboard/users/user_detail">
         <div className="user-detail">
           <img src={`https://avatar.iran.liara.run/public/boy`} alt="" />
@@ -351,11 +374,14 @@ const IT_issue_detail = () => {
                   boxShadow: "0 0 3px rgba(0, 0, 0, 0.08)",
                 }}
               ></textarea>
-              {!selectedRequest.requestStatus === "Issue_Resolved"&& 
-              <button className="confirm-pending" onClick={handleNotification}>
-                Send Notification
-              </button>
-              } 
+              {selectedRequest.requestStatus !== "Issue_Resolved" && (
+                <button
+                  className="confirm-pending"
+                  onClick={handleNotification}
+                >
+                  Send Notification
+                </button>
+              )}
             </>
           </div>
         )}
@@ -392,13 +418,19 @@ const IT_issue_detail = () => {
         selectedRequest.requestStatus === "Under_Process" ? (
           <>
             <button className="approve-btn" onClick={handleApprove}>
-              Issue Resolved?
-            </button>
+              <p>
+                {selectedRequest.type === "lost"
+                  ? "Asset Lost"
+                  : "Issue Resolved?"}
+              </p>
+            </button>         
             <button className="reject-btn" onClick={handleRejectClick}>
               Reject
             </button>
           </>
-        ) : selectedRequest.type === "maintenance" && selectedRequest.requestStatus !== "Issue_Resolved" ? (
+        ) : selectedRequest.type === "maintenance" &&
+          selectedRequest.requestStatus !== "Issue_Resolved" &&
+          selectedRequest.requestStatus !== "Request Rejected" ? (
           <>
             <button className="approve-btn" onClick={handleInitiate}>
               Mark Under Maintenance
@@ -407,7 +439,9 @@ const IT_issue_detail = () => {
               Reject
             </button>
           </>
-        ) : selectedRequest.type === "lost" && selectedRequest.requestStatus !== "Request Rejected" ? (
+        ) : selectedRequest.type === "lost" &&
+          selectedRequest.requestStatus !== "Issue_Resolved" &&
+          selectedRequest.requestStatus !== "Request Rejected" ? (
           <>
             <button className="approve-btn" onClick={handleInitiate}>
               Mark Under Process
@@ -416,9 +450,13 @@ const IT_issue_detail = () => {
               Reject
             </button>
           </>
-        ): selectedRequest.requestStatus === "Request Rejected" ? (
+        ) : selectedRequest.requestStatus === "Request Rejected" ? (
           <>
-            <button className="reject-btn" onClick={handleRejectClick}  style={{ width: "60%" }}>
+            <button
+              className="reject-btn"
+              onClick={handleRejectClick}
+              style={{ width: "60%" }}
+            >
               Asset {selectedRequest.type} Request Rejected By You
             </button>
           </>
@@ -427,6 +465,12 @@ const IT_issue_detail = () => {
             Asset Issue Resolved
           </button>
         )}
+        {selectedRequest.type === "lost" &&
+          selectedRequest.requestStatus === "Under_Process" && (
+            <button className="approve-btn" onClick={handleFound}>
+              Mark Asset as Found
+            </button>
+          )}
       </div>
     </div>
   );

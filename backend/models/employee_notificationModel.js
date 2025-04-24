@@ -33,6 +33,10 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    response_msg : {
+      type: String,
+      required: false,  
+    }
   },
   { timestamps: true }
 );

@@ -287,7 +287,18 @@
         background: linear-gradient(135deg, #005bbb, #00796b);
       }
     }
-    
+
+    .confirm-btn {
+      background: linear-gradient(
+        135deg,
+        #4caf50,
+        #66bb6a
+      ); 
+
+      &:hover {
+        background: linear-gradient(135deg, #388e3c, #43a047);
+      }
+    }
 
     .reject-btn {
       background: linear-gradient(135deg, #ff6b6b, #d84315); /* Orange-Red */

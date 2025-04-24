@@ -117,13 +117,13 @@ const useNotificationStore = create((set, get) => {
         const { selectedRequest } = get();
         await axios.post(`/api/notification/send_notification`, {
           requestId: selectedRequest._id,
-          requested_by: selectedRequest.requested_by,
-          notification,
-          type,
+          requested_by: selectedRequest.requested_by,         
+          notification,                                                                                  
+          type,                                                 
           reviewed_by: userId,
-        });
+        });         
         await get().fetchNotifications(userId);
-      } catch (error) {
+      } catch (error) { 
         toast.error(error.response?.data?.error || "Failed to reject request");
       }
     },
@@ -224,14 +224,45 @@ const useNotificationStore = create((set, get) => {
         );
       }
     },
-    issueSolved_IT: async (userId) => {
+    issueSolved_IT: async (userId, custom_Status = "Issue_Resolved") => {
       try {
         const { selectedRequest } = get();
         await axios.post(`/api/notification/issueSolved_IT`, {
           requestId: selectedRequest._id, 
           requested_by: selectedRequest.requested_by,
           user_id: userId,
+          status : custom_Status,
         });  
+        await get().fetchNotifications(userId);
+      } catch (error) {
+        toast.error(
+          error.response?.data?.error || "Failed to fetch notifications"
+        );
+      }
+    },
+    underMaintenance_IT: async (userId) => {
+      try {
+        const { selectedRequest } = get();
+        await axios.post(`/api/notification/underMaintenance_IT`, {
+          requestId: selectedRequest._id,
+          requested_by: selectedRequest.requested_by,
+          user_id: userId,
+        });
+        await get().fetchNotifications(userId);
+      } catch (error) {
+        toast.error(
+          error.response?.data?.error || "Failed to fetch notifications"
+        );
+      }
+    },
+    return_confirm: async (userId) => {
+      try {
+        const { selectedRequest } = get();
+        await axios.post(`/api/notification/return_confirm`, {
+          requestId: selectedRequest._id,                       
+          requested_by: selectedRequest.requested_by,
+          user_id: userId,                          
+        });
         await get().fetchNotifications(userId);
       } catch (error) {
         toast.error(

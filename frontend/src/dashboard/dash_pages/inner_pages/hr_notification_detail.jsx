@@ -35,7 +35,6 @@ const HR_Notification_detail = () => {
     softwareAsset,
     viewAsset,
   } = useAssetStore();
-
   const navigate = useNavigate();
   useEffect(() => {
     if (selectedRequest?.requestStatus === "Rejected") {
@@ -47,9 +46,7 @@ const HR_Notification_detail = () => {
       setShowRejection("true");
     }
     if (selectedRequest?.requestStatus === "Pending_By_IT") {
-      // if (!selectedRequest.name) {
       getPending(selectedRequest._id);
-      // }
     }
   }, [selectedRequest]);
   useEffect(() => {
@@ -281,7 +278,8 @@ const HR_Notification_detail = () => {
         {showRejection &&
           selectedRequest.requestStatus !== "Approved_By_HR" && (
             <div className="rejection-detail">
-              {rejectionReason || rejection_Reason ? (
+              {(rejectionReason || rejection_Reason) &&
+              selectedRequest.requestStatus == "Rejected" ? (
                 <>
                   <p>Rejection Reason</p>
                   <textarea

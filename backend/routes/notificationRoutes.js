@@ -15,7 +15,9 @@ import {
 
   issueSolved_IT,
   issue_messages,
-  underProcess_Issue
+  underProcess_Issue,
+  underMaintenance,
+  return_confirm
 } from "../controller/notificationController.js";
 const router = express.Router();
 
@@ -34,5 +36,8 @@ router.post("/get_pending", get_Pending);
 router.post("/send_notification", issue_messages);
 router.post("/underProcess_IT", underProcess_Issue);
 router.post("/issueSolved_IT", issueSolved_IT);
+router.post("/return_confirm", return_confirm);
+
+router.post("/underMaintenance_IT", underMaintenance);
 // router.post("/logout",logout)
 export default router;

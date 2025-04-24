@@ -221,14 +221,14 @@ const IT_Notification_detail = () => {
                 </option>
               )}
               {assets
-                .filter((asset) => asset.status !== "Assigned")
+                .filter((asset) => (asset.status !== "Assigned" || asset.status !== "Asset Lost"))
                 .filter((asset) => asset.type === selectedRequest.assetType)
                 .map((asset) => (
                   <option
                     key={asset._id}
                     value={asset._id}
                     selected={selectedAsset?._id === asset._id}
-                  >
+                  >                                             
                     {asset.name}
                   </option>
                 ))}
@@ -366,7 +366,7 @@ const IT_Notification_detail = () => {
       <div className="action-buttons">
         {selectedRequest.requestStatus !== "Asset_Allocated" &&
         selectedRequest.requestStatus !== "Software_Installed" ? (
-          <>
+          <>                                  
             <button className="approve-btn" onClick={handleApprove}>
               Allocate
             </button>

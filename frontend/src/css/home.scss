@@ -1,0 +1,207 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard {
+  .upper-div {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    gap: 50px;
+
+    .card {
+      border-radius: 0px;
+      padding: 15px 0px 0px;
+      width: 25%;
+      background-color: rgb(253, 253, 253);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      text-align: center;
+
+      .icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 50px;
+        height: 50px;
+        background-color: #eff6fc;
+        border-radius: 10px;
+
+        i {
+          font-size: 24px;
+          color: #5c6bc0;
+        }
+      }
+
+      .info {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+
+        p {
+          font-size: 25px;
+          font-weight: 600;
+          color: #5460a4;
+          line-height: 30px;
+          margin: 10px 0;
+        }
+
+        .count-tag {
+          width: 100%;
+          margin: 10px 0px 5px 0px;
+          background-color: #e3eafc;
+          color: #3f51b5;
+          padding: 2px 10px;
+          font-weight: 600;
+          font-size: 17px;
+        }
+      }
+    }
+  }
+
+  .charts {
+    display: grid;
+    margin-top: 30px;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 35px;
+
+    .chart {
+      background-color: white;
+      padding: 20px 0px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      p {
+        font-size: 1.2rem;
+        color: rgb(102, 101, 101);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+    }
+
+    .piechart {
+      grid-column: span 5;
+      width: 100%;
+
+      .data {
+        width: 90%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        select {
+          font-size: 16px;
+          width: 20%;
+          border-radius: 8px;
+          outline: none;
+          background-color: transparent;
+          color: #697489;
+          font-weight: 500;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .linechart {
+      grid-column: span 7;
+      width: 100%;
+      padding-right: 40px;
+    }
+    .barchart {
+      grid-column: span 7;
+      width: 100%;
+      padding-right: 40px;
+    }
+    .stackedchart {
+      grid-column: span 5;
+      width: 100%;
+      padding-right: 40px;
+    }
+    .table-data {
+      grid-column: span 12;
+      width: 100%;
+      grid-column: span 12;
+      .chart-table {
+        h3{
+          // text-align: center;
+        }
+        background-color: #fff;
+        padding: 16px;
+        width: 95%;
+        border-radius: 12px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+
+        .table-header {
+          margin-bottom: 12px;
+          h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #444;
+          }
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+
+          th,
+          td {
+            text-align: left;
+            padding: 10px 8px;
+            font-size: 14px;
+            i{
+              padding-left: 5px;
+              color: gray;
+              &:hover{
+                cursor: pointer;
+              }
+            }
+          }
+
+          thead {
+            background-color: #f5f5f5;
+            th {
+              font-weight: 600;
+              color: #555;
+            }
+          }
+
+          tbody {
+            tr {
+              border-bottom: 1px solid #eee;
+
+              .type {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                .icon {
+                  font-size: 16px;
+
+                  &.maintenance {
+                    color: #4caf50;
+                  }
+
+                  &.lost {
+                    color: #f44336;
+                  }
+                }
+              }
+
+              &:hover {
+                background-color: #f9f9f9;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

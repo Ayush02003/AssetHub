@@ -56,6 +56,7 @@ export const createEmployeeNotification = async ({
   requestId,
   type,
   message,
+  response_msg,
   status,
   pending_reason
 }) => {
@@ -66,6 +67,7 @@ export const createEmployeeNotification = async ({
       requestId,
       type,
       message,
+      response_msg,
       pending_reason,
       status,
     });

@@ -51,6 +51,24 @@ const Notification = () => {
   const [filterName, setFilterName] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
+  const statusOptions = [
+    ...new Set(           
+      notifications
+        .filter((noti) => (filterType ? noti.type === filterType : true))
+        .map((noti) => {
+          if (noti.type === "Software Expiry") return "software_expired";
+          const request = requests.find((req) => req._id === noti.requestId);
+          return request?.requestStatus;
+        })
+    ),
+  ].filter(Boolean);
+
+  useEffect(() => {
+    if (filterStatus && !statusOptions.includes(filterStatus)) {
+      setFilterStatus("");
+    }
+  }, [filterType]);
+
   const filteredNotification = notifications.filter((noti) => {
     let match;
 
@@ -101,30 +119,21 @@ const Notification = () => {
                   )
                 )}
               </select>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="">All Status</option>
-                {[
-                  ...new Set(
-                    filteredNotification.map((noti) => {
-                      if (noti.type === "Software Expiry")
-                        return "software_expired";
-                      const request = requests.find(
-                        (req) => req._id === noti.requestId
-                      );
-                      return request?.requestStatus;
-                    })
-                  ),
-                ]
-                  .filter(Boolean)
-                  .map((status) => (
-                    <option key={status} value={status}>
-                      {status.replace(/_/g, " ")}
-                    </option>
-                  ))}
-              </select>
+              {authUser.role !== "Employee" && (
+                <>
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                  >
+                    <option value="">All Status</option>
+                    {statusOptions.map((status) => (
+                      <option key={status} value={status}>
+                        {status.replace(/_/g, " ")}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
             </div>
           </>
         )}
@@ -140,43 +149,72 @@ const Notification = () => {
               const matchingRequest = requests.find(
                 (req) => req._id === notif.requestId
               );
-              if (
-                filterStatus &&
-                (notif.type !== "Software Expiry"
-                  ? !matchingRequest ||
-                    matchingRequest.requestStatus !== filterStatus
-                  : filterStatus !== "software_expired")
-              ) {
-                return null;
+              // if (
+              //   filterStatus &&
+              //   (notif.type !== "Software Expiry"
+              //     ? !matchingRequest ||
+              //       matchingRequest.requestStatus !== filterStatus
+              //     : filterStatus !== "software_expired")
+              // ) {
+              //   return null;
+              // }
+              if (filterStatus) {
+                if (filterStatus === "Response") {
+                  const isResponseMessage =
+                    notif.message.includes("responded to");
+                  if (!isResponseMessage) return null;
+                } else if (notif.type === "Software Expiry") {
+                  if (filterStatus !== "software_expired") return null;
+                } else if (
+                  !matchingRequest ||
+                  matchingRequest.requestStatus !== filterStatus
+                ) {
+                  return null;
+                }
               }
-
               const isUnread = notif.status === "unread";
 
               return (
                 <NavLink
-                  to={
-                    notif.type === "Software Expiry" &&
-                    authUser.role === "Employee"
-                      ? "/dashboard/home"
-                      : notif.type === "Software Expiry"
-                      ? `/dashboard/total_asset/asset_detail?id=${notif.assetId}`
-                      : `/dashboard/notification/${
-                          authUser.role === "HR"
-                            ? "hr_notification_detail"
-                            : authUser.role === "IT-Person"
-                            ? notif.type === "Asset Issue Request"
-                              ? "it_issue_detail"
-                              : "it_notification_detail"
-                            : authUser.role === "Employee"
-                            ? notif.type === "Asset Issue Request"
-                              ? "emp_issue_detail"
-                              : "emp_notification_detail"
-                            : "emp_notification_detail"
-                        }`
-                  }
+                  to={(() => {
+                    if (notif.type === "Software Expiry") {
+                      return authUser.role === "Employee"
+                        ? "/dashboard/home"
+                        : `/dashboard/total_asset/asset_detail?id=${notif.assetId}`;
+                    }
+
+                    const basePath = "/dashboard/notification/";
+
+                    if (authUser.role === "HR") {
+                      return basePath + "hr_notification_detail";
+                    }
+
+                    if (authUser.role === "IT-Person") {
+                      if (notif.type === "Asset Issue Request") {
+                        return basePath + "it_issue_detail";
+                      } else if (notif.type === "Asset Return Request") {
+                        return basePath + "it_return_detail";
+                      } else {
+                        return basePath + "it_notification_detail";
+                      }
+                    }
+
+                    if (authUser.role === "Employee") {
+                      if (notif.type === "Asset Return Request") {
+                        return basePath + "emp_return_detail";
+                      }
+                      return (
+                        basePath +
+                        (notif.type === "Asset Issue Request"
+                          ? "emp_issue_detail"
+                          : "emp_notification_detail")
+                      );
+                    }
+
+                    return basePath + "emp_notification_detail";
+                  })()}
                   key={notif._id}
                   onClick={() => {
-                    // viewRequest(matchingRequest);
                     if (notif.type !== "Software Expiry") {
                       viewNotification(notif);
                       viewRequest(matchingRequest);
@@ -241,7 +279,20 @@ const Notification = () => {
                                 Under Maintenance
                               </p>
                             ),
-
+                          "IT has responded to your asset return request. View their message":
+                            <p className="approved_by_hr">Response</p>,
+                          "Your asset return request is now being processed by IT.":
+                            (
+                              <p className="under_maintenance">
+                                Under Maintenance
+                              </p>
+                            ),
+                          "Your asset return request is completed.": (
+                            <p className="return_completed">Return Completed</p>
+                          ),
+                          "Your maintenance request has been rejected by IT.": (
+                            <p className="rejected">Request Rejected</p>
+                          ),
                           "Your lost request is now being processed by IT.": (
                             <p className="under_process">Under Process</p>
                           ),
@@ -249,6 +300,9 @@ const Notification = () => {
                             <p className="software_expired">Rejected</p>
                           ),
                           "Your maintenance request is resolved.": (
+                            <p className="issue_resolved">Issue Resolved</p>
+                          ),
+                          "Your lost request is resolved.": (
                             <p className="issue_resolved">Issue Resolved</p>
                           ),
                           "Your software request has been rejected by HR": (

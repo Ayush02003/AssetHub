@@ -5,6 +5,7 @@ import Employee_Notification from "../models/employee_notificationModel.js";
 import AssetRequest from "../models/assetRequestModel.js";
 import SoftwareRequest from "../models/softwareRequestModel.js";
 import AssetIssue from "../models/assetIssueModel.js";
+import AssetReturn from "../models/assetReturnModel.js";
 import Asset from "../models/assetModel.js";
 import Employee from "../models/employeeModel.js";
 import AssetAllocation from "../models/assetAllocationModel.js";
@@ -31,16 +32,19 @@ export const getNotification = async (req, res) => {
 
     const requestIds = notifications.map((notif) => notif.requestId);
 
-    const [assetRequests, softwareRequests, assetIssues] = await Promise.all([
-      AssetRequest.find({ _id: { $in: requestIds } }),
-      SoftwareRequest.find({ _id: { $in: requestIds } }),
-      AssetIssue.find({ _id: { $in: requestIds } }),
-    ]);
+    const [assetRequests, softwareRequests, assetIssues, assetReturns] =
+      await Promise.all([
+        AssetRequest.find({ _id: { $in: requestIds } }),
+        SoftwareRequest.find({ _id: { $in: requestIds } }),
+        AssetIssue.find({ _id: { $in: requestIds } }),
+        AssetReturn.find({ _id: { $in: requestIds } }),
+      ]);
 
     const combinedRequests = [
       ...assetRequests,
       ...softwareRequests,
       ...assetIssues,
+      ...assetReturns,
     ];
 
     return res.status(200).json({ notifications, requests: combinedRequests });
@@ -456,14 +460,14 @@ export const checkSoftwareExpiry = async (req, res) => {
       // console.log(software.name)
       if (!lastNotified || (now - lastNotified) / (1000 * 60 * 60 * 24) >= 7) {
         software.lastExpiryNotified = new Date(now);
-        await software.save();
+        await software.save();                                    
 
         const asset_allocation = await AssetAllocation.findOne({
           asset_id: software.assigned_laptop_id,
         });
 
-        if (asset_allocation) {
-          await createEmployeeNotification({
+        if (asset_allocation) {                                       
+          await createEmployeeNotification({              
             receiverId: asset_allocation.user_id,
             assetId: asset_allocation.asset_id,
             type: "Software Expiry",
@@ -479,6 +483,16 @@ export const checkSoftwareExpiry = async (req, res) => {
             status: "unread",
           });
         }
+        else{
+          await createITNotification({
+            receiverId: software.installed_by,
+            assetId: software.assigned_laptop_id,
+            type: "Software Expiry",
+            message: `Software ${software.name} installed in asset has expired`,
+            status: "unread",
+          });
+       
+        }
       }
     }
   } catch (error) {
@@ -492,32 +506,51 @@ export const issue_messages = async (req, res) => {
       req.body;
 
     const it_user = await Employee.findById(reviewed_by);
-    const request = await AssetIssue.findById(requestId);
+    let request = await AssetIssue.findById(requestId);
+    if (!request) {
+      request = await AssetReturn.findById(requestId);
+    }
+    const asset = await Asset.findById(request.asset_id);
     let message;
     if (!it_user) {
       return res.status(404).json({ error: "User not found" });
     }
     if (type === "reject") {
+      if (request.type === "lost") {
+        asset.status = "Asset Lost";
+      } else {
+        asset.status = "Assigned";
+      }
       request.requestStatus = "Request Rejected";
       request.rejected_by = reviewed_by;
       request.rejection_reason = notification;
-      message = `Your ${request.type} request has been rejected by IT.`;
+      if (!request.type) {
+        message = `Your asset return request has been rejected by IT.`;
+      } else {
+        message = `Your ${request.type} request has been rejected by IT.`;
+      }
     } else {
-      request.requestStatus = "Response";
+      // request.requestStatus = "Response";
       request.reviewed_by = reviewed_by;
       request.review_comment = notification;
-      message = `IT has responded to your ${request.type} request. View their message`;
+      if (!request.type) {
+        message = `IT has responded to your asset return request. View their message`;
+      } else {
+        message = `IT has responded to your ${request.type} request. View their message`;
+      }
     }
-    request.save();
-
+    await request.save();
+    await asset.save();
     const employeeNotification = await createEmployeeNotification({
       receiverId: requested_by,
       requestId: requestId,
-      type: "Asset Issue Request",
+      type: ["maintenance", "lost"].includes(request.type)
+        ? "Asset Issue Request"
+        : "Asset Return Request",
       message: message,
+      response_msg: notification,
       status: "unread",
     });
-
     return res.status(200).json({ request });
   } catch (error) {
     console.error("Error in getNotifications:", error.message);
@@ -531,24 +564,39 @@ export const underProcess_Issue = async (req, res) => {
 
     const request = await AssetIssue.findById(requestId);
     const user = await Employee.findById(requested_by);
-
+    const asset = await Asset.findById(request.asset_id);
     if (!request) return res.status(404).json({ error: "Request not found" });
     if (!user) return res.status(404).json({ error: "User not found" });
 
     if (request.type === "lost") {
       request.requestStatus = "Under_Process";
+      asset.status = "Under_Process";
     }
     if (request.type === "maintenance") {
       request.requestStatus = "Under_Maintenance";
+      asset.status = "Under_Maintenance";
     }
+    await asset.save();
     request.reviewed_by = user_id;
+    let msg;
+    // if (!request.review_comment || request.review_comment.trim() === "") {
+    if (request.type === "lost") {
+      msg = "IT team is currently investigating the lost asset.";
+    } else if (request.type === "maintenance") {
+      msg = "Asset is currently under maintenance by the IT team.";
+    } else {
+      msg = "Issue is currently being processed.";
+    }
+    // }
+    request.review_comment = msg;
     await request.save();
 
     await createEmployeeNotification({
-      receiverId: user._id, 
+      receiverId: user._id,
       requestId: request._id,
       type: "Asset Issue Request",
       message: `Your ${request.type} request is now being processed by IT.`,
+      response_msg: msg,
       status: "unread",
     });
 
@@ -561,29 +609,130 @@ export const underProcess_Issue = async (req, res) => {
 
 export const issueSolved_IT = async (req, res) => {
   try {
-    const { requestId, requested_by, user_id } = req.body;
+    const { requestId, requested_by, user_id, status } = req.body;
 
     const request = await AssetIssue.findById(requestId);
     const user = await Employee.findById(requested_by);
-
+    const asset = await Asset.findById(request.asset_id);
     if (!request) return res.status(404).json({ error: "Request not found" });
     if (!user) return res.status(404).json({ error: "User not found" });
 
+    if (request.type === "lost") {
+      if (status === "Asset_Found") {
+        asset.status = "Assigned";
+      } else {
+        asset.status = "Asset Lost";
+      }
+    }
+    if (request.type === "maintenance") {
+      asset.status = "Assigned";
+    }
+    await asset.save();
+    let msg;
     request.requestStatus = "Issue_Resolved";
-
+    // if (!request.review_comment || request.review_comment.trim() === "") {
+    if (request.type === "lost") {
+      msg =
+        status === "Asset_Found"
+          ? "Asset has been found and reassigned."
+          : "Asset could not be recovered and is marked as lost.";
+    } else if (request.type === "maintenance") {
+      msg = "Maintenance completed and asset is ready for use.";
+    } else {
+      msg = "Issue resolved by IT.";
+    }
+    // }
+    request.review_comment = msg;
     request.reviewed_by = user_id;
     await request.save();
-    // console.log("Hi")
     await createEmployeeNotification({
       receiverId: user._id,
       requestId: request._id,
       type: "Asset Issue Request",
       message: `Your ${request.type} request is resolved.`,
+      response_msg: msg,
       status: "unread",
     });
+    return res
+      .status(200)
+      .json({ message: "Issue resolved successfully", request });
+  } catch (error) {
+    console.error("Error in asset_allocate_IT:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const underMaintenance = async (req, res) => {
+  try {
+    const { requestId, requested_by, user_id } = req.body;
+
+    const request = await AssetReturn.findById(requestId);
+    const user = await Employee.findById(requested_by);
+    const asset = await Asset.findById(request.asset_id);
+    if (!request) return res.status(404).json({ error: "Request not found" });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    request.requestStatus = "Under_Maintenance";
+    asset.status = "Under_Maintenance";
+
+    await asset.save();
+    request.reviewed_by = user_id;
+    let msg;
+
+    msg = "Asset is currently under maintenance by the IT team.";
+
+    request.review_comment = msg;
+    await request.save();
+
+    await createEmployeeNotification({
+      receiverId: user._id,
+      requestId: request._id,
+      type: "Asset Return Request",
+      message: `Your asset return request is now being processed by IT.`,
+      response_msg: msg,
+      status: "unread",
+    });
+
     return res.status(200).json({ message: "Request Under Process", request });
   } catch (error) {
     console.error("Error in asset_allocate_IT:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const return_confirm = async (req, res) => {
+  try {
+    const { requestId, requested_by, user_id } = req.body;
+
+    const request = await AssetReturn.findById(requestId);
+    const user = await Employee.findById(requested_by);
+    const asset = await Asset.findById(request.asset_id);
+    if (!request) return res.status(404).json({ error: "Request not found" });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    await AssetAllocation.findOneAndDelete({asset_id : request.asset_id})
+    asset.status = "Not Assigned";
+    await asset.save();
+    let msg;
+    request.requestStatus = "Return_Completed";
+
+    msg = "The return process has been completed.";
+
+    request.review_comment = msg;
+    request.reviewed_by = user_id;
+    await request.save();
+    await createEmployeeNotification({
+      receiverId: user._id,
+      requestId: request._id,
+      type: "Asset Return Request",
+      message: `Your asset return request is completed.`,
+      response_msg: msg,
+      status: "unread",
+    });
+    return res
+      .status(200)
+      .json({ message: "Asset Return successfully", request });
+  } catch (error) {
+    console.error("Error in return_confirm:", error.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };

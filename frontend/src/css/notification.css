@@ -106,6 +106,9 @@
 .user-main-noti .lower-component .inner-component .icon.software-request {
   background: #ff9800;
 }
+.user-main-noti .lower-component .inner-component .icon.asset-return-request {
+  background: #4dabf7;
+}
 .user-main-noti .lower-component .inner-component .icon.info {
   background: #007bff;
 }
@@ -149,6 +152,10 @@
   background: #cce5ff;
   color: #004085;
 }
+.user-main-noti .lower-component .inner-component .status p.response {
+  background: #cce5ff;
+  color: #004085;
+}
 .user-main-noti .lower-component .inner-component .status p.asset_allocated {
   background: #d4edda;
   color: #155724;
@@ -156,6 +163,11 @@
 .user-main-noti .lower-component .inner-component .status p.software_installed {
   background: #d4edda;
   color: #155724;
+}
+.user-main-noti .lower-component .inner-component .status p.return_completed {
+  background: #e6f7ff;
+  color: #004085;
+  border-left: 4px solid #91d5ff;
 }
 .user-main-noti .lower-component .inner-component .status p.pending {
   background: #ffeeba;
@@ -229,6 +241,10 @@
 
 .asset-issue-request.unread-notification .icon::after {
   background-color: #ff7777;
+}
+
+.asset-return-request.unread-notification .icon::after {
+  background: #4dabf7;
 }
 
 @keyframes glow {

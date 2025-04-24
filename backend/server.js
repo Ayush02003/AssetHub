@@ -7,7 +7,7 @@ import companyRoutes from "./routes/companyRoutes.js"
 import notificationRoutes from "./routes/notificationRoutes.js"
 import connectToMongoDB from "./db/mongoDB.js";
 import cookieParser from "cookie-parser";
-import cors from "cors"
+import cors from "cors"         
 import "./utils/checkSoftwareExpiry.js"
 
 const app = express() 

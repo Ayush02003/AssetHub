@@ -30,6 +30,13 @@
 .asset_main .asset_form .asset-lower-part table {
   width: 100%;
 }
+.asset_main .asset_form .asset-lower-part table tr textarea {
+  outline: none;
+}
+.asset_main .asset_form .asset-lower-part table tr textarea:focus {
+  border: none;
+  box-shadow: 0 0 3px #2c384d;
+}
 .asset_main .asset_form .asset-lower-part table tr td:has(label) {
   padding-bottom: 8px;
   padding-top: 15px;

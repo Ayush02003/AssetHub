@@ -64,7 +64,7 @@ const Request_issue_form = () => {
               <tbody>
                 <tr>
                   <td>
-                    <label>Request Type</label>
+                    <label>Asset Help Type</label>
                   </td>
                 </tr>
                 <tr>
@@ -135,7 +135,7 @@ const Request_issue_form = () => {
                       </option>
                       {assets.length > 0 ? (
                         assets
-                          .filter((asset) => asset.type === assetType)
+                          .filter((asset) => (asset.type === assetType && asset.status !== "Asset Lost"))
                           .map((asset) => (
                             <option key={asset._id} value={asset._id}>
                               {asset.name}

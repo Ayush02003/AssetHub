@@ -1,6 +1,7 @@
 import AssetRequest from "../models/assetRequestModel.js";
 import SoftwareRequest from "../models/softwareRequestModel.js";
 import AssetIssue from "../models/assetIssueModel.js";
+import AssetReturn from "../models/assetReturnModel.js";
 import Employee from "../models/employeeModel.js";
 import {
   createHRNotification,
@@ -215,6 +216,72 @@ export const addAssetIssue = async (req, res) => {
       message: `${
         type.charAt(0).toUpperCase() + type.slice(1)
       } request submitted successfully.`,
+      request: newAssetIssue,
+    });
+  } catch (error) {
+    console.error("Error in addAssetIssue:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+
+
+
+export const addAssetReturn = async (req, res) => {
+  try {
+    const { assignedLaptopId, condition, return_reason, requested_by } = req.body;
+
+    if (!assignedLaptopId || !condition || !return_reason || !requested_by) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    const user = await Employee.findById(requested_by);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    let itUsers = await Employee.find({
+      department: user.department,
+      designation: "IT-Person",
+    });
+
+    if (itUsers.length === 0) {
+      itUsers = await Employee.find({
+        department: "All",
+        designation: "IT-Person",
+      });
+    }
+
+    if (itUsers.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No IT personnel found to handle the request." });
+    }
+
+    const newAssetIssue = new AssetReturn({
+      requested_by,
+      asset_id: assignedLaptopId,
+      condition,
+      return_reason,
+    });
+
+    await newAssetIssue.save();
+
+    await Promise.all(
+      itUsers.map((it) =>
+        createITNotification({
+          receiverId: it._id,
+          requestId: newAssetIssue._id,               
+          type: "Asset Return Request",
+          message: `New asset return request from ${user.name}`,
+          status: "unread",
+        })
+      )
+    );
+                                    
+    return res.status(201).json({
+      message: `Asset return request submitted successfully.`,
       request: newAssetIssue,
     });
   } catch (error) {

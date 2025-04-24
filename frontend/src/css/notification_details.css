@@ -259,6 +259,12 @@
 .main-noti-detail .action-buttons .approve-btn:hover {
   background: linear-gradient(135deg, #005bbb, #00796b);
 }
+.main-noti-detail .action-buttons .confirm-btn {
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+}
+.main-noti-detail .action-buttons .confirm-btn:hover {
+  background: linear-gradient(135deg, #388e3c, #43a047);
+}
 .main-noti-detail .action-buttons .reject-btn {
   background: linear-gradient(135deg, #ff6b6b, #d84315); /* Orange-Red */
 }

@@ -9,7 +9,7 @@ import useAssetStore from "../../../zustand/useAssetStore.js";
 import "../../../css/notification_details.css";
 // import Swal from "sweetalert2";
 import { NavLink } from "react-router-dom";
-const Emp_issue_detail = () => {
+const Emp_return_detail = () => {
   // const { authUser } = useAuthContext();
   const { selectedUser, fetchUsers, users, viewUser } = useUserStore();
   const [showNotify, setShowNotify] = useState(true);
@@ -95,11 +95,8 @@ const Emp_issue_detail = () => {
       <div className="title-container">
         <i onClick={() => navigate(-1)} className="fa fa-arrow-left"></i>
         <p>
-          {selectedRequest.type === "maintenance" ? (
-            <span>Maintenance Request</span>
-          ) : (
-            <span>Lost Report</span>
-          )}
+            <span>Asset Return</span>
+          
         </p>
       </div>
       <hr />
@@ -227,54 +224,13 @@ const Emp_issue_detail = () => {
           <table>
             <tbody>
               <tr>
-                <td>Description:</td>
-                <td>{selectedRequest?.description || "N/A"}</td>
+                <td>Condition:</td>
+                <td>{selectedRequest?.condition || "N/A"}</td>
               </tr>
-
-              {selectedRequest?.type === "lost" && (
-                <tr>
-                  <td>Lost Date:</td>
-                  <td>
-                    {selectedRequest?.lost_date
-                      ? new Date(selectedRequest.lost_date).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )
-                      : "N/A"}
-                  </td>
-                </tr>
-              )}
-
               <tr>
-                <td>Supporting Document:</td>
-                <td>
-                  {selectedRequest?.file ? (
-                    <a
-                      href={selectedRequest.file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={selectedRequest.file}
-                        alt="Preview"
-                        style={{
-                          height: "80px",
-                          objectFit: "cover",
-                          cursor: "pointer",
-                          borderRadius: "5px",
-                          boxShadow: "0px 0px 2px gray",
-                        }}
-                      />
-                    </a>
-                  ) : (
-                    "N/A"
-                  )}
-                </td>
-              </tr>
+                <td>Return Reason:</td>
+                <td>{selectedRequest?.return_reason}</td>
+              </tr>  
             </tbody>
           </table>
         </div>
@@ -361,10 +317,31 @@ const Emp_issue_detail = () => {
           <button className="pending-btn" style={{ width: "60%" }}>
             Lost Item Investigation Ongoing
           </button>
-        ) : selectedNotification.message ===
+        ): selectedNotification.message ===
+        "Your asset return request is now being processed by IT." ? (
+        <button className="pending-btn" style={{ width: "60%" }}>
+          Maintenance In Progress
+        </button>
+      ): selectedNotification.message ===
+      "IT has responded to your asset return request. View their message" ? (
+      <button className="pending-btn" style={{ width: "60%" }}>
+        IT Responded to asset return Request
+      </button>
+    ): selectedNotification.message ===
+        "Your asset return request has been rejected by IT." ? (
+        <button className="rejected-btn" style={{ width: "60%" }}>
+          Asset Return Request Rejected by IT
+        </button>
+      ) : selectedNotification.message ===
           "Your lost request is resolved." ? (
           <button className="approve-btn" style={{ width: "60%" }}>
             Lost Request Resolved
+          </button>
+        )
+        : selectedNotification.message ===
+          "Your asset return request is completed." ? (
+          <button className="approve-btn" style={{ width: "60%" }}>
+            Asset Return Completed
           </button>
         ) : selectedNotification.message ===
           "Your maintenance request is resolved." ? (
@@ -382,4 +359,5 @@ const Emp_issue_detail = () => {
   );
 };
 
-export default Emp_issue_detail;
+export default Emp_return_detail;
+ 

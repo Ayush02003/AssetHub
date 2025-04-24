@@ -1,64 +1,52 @@
 import { useState, useEffect } from "react";
 import "../../css/add_asset.css";
-import use_addRequestSoftware from "../../hooks/UseAddRequestSoftware.js";
+import use_addAssetReturn from "../../hooks/UseAssetReturn";
 import useAssetStore from "../../zustand/useAssetStore.js";
-// import toast from "react-hot-toast";
-
 import { useAuthContext } from "../../context/AuthContext.jsx";
-const Request_software = () => {
-    const { assets, fetchUserAssets } = useAssetStore();
-    const { authUser } = useAuthContext();
 
-    useEffect(() => {
+// import toast from "react-hot-toast";
+const Asset_return = () => {
+  const { assets, fetchUserAssets } = useAssetStore();
+  const [condition, setCondition] = useState("");
+
+  const { authUser } = useAuthContext();
+
+  useEffect(() => {
     fetchUserAssets(authUser.id);
   }, []);
-
   const [assignedLaptopId, setAssignedLaptopId] = useState("");
-  const [name, setName] = useState("");
-  const [version, setVersion] = useState("");
+  const [return_reason, setReturnReason] = useState("");
   const [assetType, setAssetType] = useState("");
-  const [software_purpose, setSoftware_purpose] = useState("");
-  const [expected_duration, setExpected_duration] = useState("");
-  const { loading, request_software } = use_addRequestSoftware();
-
-
+  const { loading, assetReturn } = use_addAssetReturn();
+  //   const today = new Date().toISOString().split("T")[0];
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await request_software(
-      assignedLaptopId,
-      name,
-      version,
-      software_purpose,
-      expected_duration,
-    );
-
+    await assetReturn(assignedLaptopId, condition, return_reason);
+    
+    setCondition("");
     setAssignedLaptopId("");
-    setName("");
-    setVersion("");
-    setSoftware_purpose("")
-    setAssetType("")
-    setExpected_duration("");
+    setReturnReason("");
+    setAssetType("");
   };
-
   return (
     <div className="asset_main">
       <style>
         {`
-          select {
-            width: 100%;
-            background-color: #F0F4FA;
-            padding: 8px 10px 8px 50px;
-            appearance: none;
-            border-radius: 5px;
-            cursor: pointer;
-          }
-        `}
+            select {
+              width: 100%;
+              background-color: #F0F4FA;
+              padding: 8px 10px 8px 50px;
+              appearance: none;
+              border-radius: 5px;
+              cursor: pointer;
+            }
+          `}
       </style>
-      <h2>REQUEST SOFTWARE</h2>
+      <h2>Asset Return Form</h2>
       <div className="asset_form">
         <div className="asset-upper-part">
-          <h4>Software Information</h4>
+          <h4>Asset Information</h4>
         </div>
         <div className="asset-lower-part">
           <form onSubmit={handleSubmit}>
@@ -112,7 +100,11 @@ const Request_software = () => {
                       </option>
                       {assets.length > 0 ? (
                         assets
-                          .filter((asset) => (asset.type === assetType && asset.status !== "Asset Lost"))
+                          .filter(
+                            (asset) =>
+                              asset.type === assetType &&
+                              asset.status !== "Asset Lost"
+                          )
                           .map((asset) => (
                             <option key={asset._id} value={asset._id}>
                               {asset.name}
@@ -148,84 +140,56 @@ const Request_software = () => {
                     />
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <label>Software Name</label>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <i className="fa-solid fa-box-open"></i>
-                    <input
-                      required
-                      type="text"
-                      placeholder="Enter Software Name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <label>Software Purpose</label>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                  <i className="fa-solid fa-lightbulb"></i>
 
-                    <input
-                      required
-                      type="text"
-                      placeholder="Enter Software Purpose"
-                      value={software_purpose}
-                      onChange={(e) => setSoftware_purpose(e.target.value)}
-                    />
-                  </td>
-                </tr>      
                 <tr>
                   <td>
-                    <label>Software Version</label>
+                    <label>Condition of Asset</label>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <i className="fa-solid fa-code-branch"></i>
-                    <input
+                    <textarea
                       required
-                      type="text"
-                      placeholder="Enter Software Version"
-                      value={version}
-                      onChange={(e) => setVersion(e.target.value)}
-                    />
+                      placeholder="Describe any wear, damage, or missing parts (if any)"
+                      value={condition}
+                      onChange={(e) => setCondition(e.target.value)}
+                      rows={2}
+                      style={{
+                        resize: "none",
+                        backgroundColor: "#F0F4FA",
+                        width: "100%",
+                        padding: "8px",
+                        borderRadius: "5px",
+                      }}
+                    ></textarea>
                   </td>
                 </tr>
 
                 <tr>
                   <td>
-                    <label>Expected Duration</label>
+                    <span>
+                      <label>Asset Return Reason</label>
+                    </span>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <i className="fa-solid fa-file-contract"></i>
-                    <select
-                      value={expected_duration}
-                      onChange={(e) => setExpected_duration(e.target.value)}
+                    <textarea
                       required
-                    >
-                      <option style={{ color: "#9ea3ae" }} value="">
-                        Select Expected Duration
-                      </option>
-                      <option value="6 Month">6 Month</option>
-                      <option value="1 Year">1 Year</option>
-                      <option value="More Than 1 Year">More Than 1 Year</option>
-                    </select>
+                      placeholder="Explain why you are returning the asset (e.g., no longer needed, replacement received, end of project, etc.)"
+                      value={return_reason}
+                      onChange={(e) => setReturnReason(e.target.value)}
+                      rows={3}
+                      style={{
+                        resize: "none",
+                        backgroundColor: "#F0F4FA",
+                        width: "100%",
+                        padding: "8px",
+                        borderRadius: "5px",
+                      }}
+                    ></textarea>
                   </td>
                 </tr>
-
-
-              
 
                 <tr>
                   <td className="button">
@@ -233,7 +197,7 @@ const Request_software = () => {
                       {loading ? (
                         <span className="loading loading-spinner"></span>
                       ) : (
-                        "Add Software"
+                        "Submit"
                       )}
                     </button>
                     <input
@@ -242,11 +206,9 @@ const Request_software = () => {
                       value="Cancel"
                       onClick={() => {
                         setAssignedLaptopId("");
-                        setName("");
-                        setVersion("");
-                        setSoftware_purpose("")
-                        setAssetType("")
-                        setExpected_duration("");
+                        setReturnReason("");
+                        setAssetType("");
+                        setCondition("");
                       }}
                     />
                   </td>
@@ -260,4 +222,4 @@ const Request_software = () => {
   );
 };
 
-export default Request_software;
+export default Asset_return;

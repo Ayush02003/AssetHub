@@ -96,7 +96,7 @@ const Asset_detail = () => {
       });
     }
   }, [selectedSoftware]);
-
+        
   const handleChange = (e) => {
     setAssetData({ ...assetData, [e.target.name]: e.target.value });
   };

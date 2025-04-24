@@ -30,6 +30,13 @@
       table {
         width: 100%;
         tr {
+          textarea{
+            outline: none;
+            &:focus{
+            border: none;
+            box-shadow: 0 0 3px #2c384d;
+            }
+          }
           td:has(label) {
             padding-bottom: 8px;
             padding-top: 15px;

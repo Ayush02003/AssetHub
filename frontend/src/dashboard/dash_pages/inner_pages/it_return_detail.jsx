@@ -1,30 +1,30 @@
-// import toast from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import useNotificationStore from "../../../zustand/useNotificationStore.js";
 import useUserStore from "../../../zustand/useUserStore.js";
 import { useNavigate } from "react-router-dom";
-// import { useAuthContext } from "../../../context/AuthContext.jsx";
+import { useAuthContext } from "../../../context/AuthContext.jsx";
 import useAssetStore from "../../../zustand/useAssetStore.js";
 import "../../../css/notification_details.css";
-// import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 import { NavLink } from "react-router-dom";
-const Emp_issue_detail = () => {
-  // const { authUser } = useAuthContext();
+const IT_return_detail = () => {
+  const { authUser } = useAuthContext();
   const { selectedUser, fetchUsers, users, viewUser } = useUserStore();
   const [showNotify, setShowNotify] = useState(true);
   const [showReject, setShowReject] = useState(false);
   const [notification, setNotification] = useState("");
   const [rejection_Reason, setRejectionReason] = useState("");
   const {
-    // sendNotification,
+    sendNotification,
     selectedNotification,
     selectedRequest,
-    // fetchNotifications,
+    fetchNotifications,
 
-    // underProcess_IT,
-    // issueSolved_IT,
-  } = useNotificationStore();
+    underMaintenance_IT,
+    return_confirm,
+  } = useNotificationStore();  
   const {
     fetchAssets,
     assets,
@@ -41,13 +41,10 @@ const Emp_issue_detail = () => {
       if (
         selectedRequest?.review_comment &&
         !selectedRequest.rejection_reason
-      ) {                           
-        // setNotification(selectedRequest.review_comment);
-        
-        setNotification(selectedNotification.response_msg);
+      ) {
+        setNotification(selectedRequest.review_comment);
         // setShowNotify(true);
       } else if (selectedRequest?.requestStatus === "Request Rejected") {
-        console.log("Rejected")
         setRejectionReason(selectedRequest.rejection_reason);
         setShowNotify(false);
         setShowReject(true);
@@ -56,8 +53,24 @@ const Emp_issue_detail = () => {
     fetchNotification();
   }, [selectedRequest]);
 
+  const handleRejectClick = () => {
+    setShowNotify(false);
+    setShowReject(true);
+  };
   const [selectedLaptop, setSelectedLaptop] = useState("");
- 
+  const handleNotification = async () => {
+    if (!notification && showNotify) {
+      toast.error("Please Provide Message");
+      return;
+    } else if (!rejection_Reason && showReject) {
+      toast.error("Provide Rejection Reason");
+      return;
+    }
+    const msg = showNotify ? notification : rejection_Reason;
+    const type = showNotify ? "noti" : "reject";
+    await sendNotification(authUser.id, msg, type);
+    await fetchNotifications(authUser.id);
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -85,7 +98,54 @@ const Emp_issue_detail = () => {
     return <Navigate to="/dashboard/notification" />;
   }
 
-  
+  const handleInitiate = async () => {
+    underMaintenance_IT(authUser.id);
+  };
+  const handleApprove = async () => {
+    Swal.fire({
+      title: "Confirm Maintenance Resolution?",
+      text: "Are you sure the asset has been fixed and is ready to be used again?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Mark as Resolved",
+      cancelButtonText: "No, Cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await return_confirm(authUser.id);
+        await fetchNotifications(authUser.id);
+        Swal.fire(
+          "Updated!",
+          "The asset has been marked as resolved and is no longer under maintenance.",
+          "success"
+        );
+      }
+    });
+  };
+  const handleConfirmReturn = async () => {
+    const confirm = await Swal.fire({
+      title: "Confirm Asset Return?",
+      text: "Are you sure the asset has been returned and is now back in inventory?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Confirm Return",
+      cancelButtonText: "Cancel",
+    });                                                       
+
+    if (confirm.isConfirmed) {                                                                  
+      try {                                                
+        await return_confirm(authUser.id);                                      
+        await fetchNotifications(authUser.id);
+        toast.success("Asset return confirmed and updated successfully!");
+      } catch (err) {
+        toast.error("Something went wrong while updating: " + err);
+      }
+    }
+  };
+  const handleLaptopChange = (e) => {
+    const assetId = e.target.value;
+    setSelectedLaptop(assetId);
+  };
+
   const selectedAssetDetail = assets.find(
     (asset) => asset._id === selectedLaptop
   );
@@ -94,13 +154,7 @@ const Emp_issue_detail = () => {
     <div className="main-noti-detail">
       <div className="title-container">
         <i onClick={() => navigate(-1)} className="fa fa-arrow-left"></i>
-        <p>
-          {selectedRequest.type === "maintenance" ? (
-            <span>Maintenance Request</span>
-          ) : (
-            <span>Lost Report</span>
-          )}
-        </p>
+        <p>Asset Return</p>
       </div>
       <hr />
       <NavLink to="/dashboard/users/user_detail">
@@ -115,16 +169,7 @@ const Emp_issue_detail = () => {
       </NavLink>
       <div className="available-laptop">
         {selectedAsset ? (
-          <p>
-            {selectedRequest.type === "maintenance" ? (
-              `${selectedAsset.type} for Maintenance`
-            ) : (
-              <>
-                <i className="fa fa-laptop"></i>
-                Lost {selectedAsset.type}
-              </>
-            )}
-          </p>
+          <p>{selectedAsset.type} For Return</p>
         ) : (
           <p>
             <>
@@ -149,7 +194,7 @@ const Emp_issue_detail = () => {
             <select
               name=""
               id=""
-              // onChange={handleLaptopChange}
+              onChange={handleLaptopChange}
               disabled={!!selectedAsset}
             >
               <option value="">-- Select {selectedRequest.assetType} --</option>
@@ -227,53 +272,13 @@ const Emp_issue_detail = () => {
           <table>
             <tbody>
               <tr>
-                <td>Description:</td>
-                <td>{selectedRequest?.description || "N/A"}</td>
+                <td>Condition:</td>
+                <td>{selectedRequest?.condition || "N/A"}</td>
               </tr>
 
-              {selectedRequest?.type === "lost" && (
-                <tr>
-                  <td>Lost Date:</td>
-                  <td>
-                    {selectedRequest?.lost_date
-                      ? new Date(selectedRequest.lost_date).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )
-                      : "N/A"}
-                  </td>
-                </tr>
-              )}
-
               <tr>
-                <td>Supporting Document:</td>
-                <td>
-                  {selectedRequest?.file ? (
-                    <a
-                      href={selectedRequest.file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={selectedRequest.file}
-                        alt="Preview"
-                        style={{
-                          height: "80px",
-                          objectFit: "cover",
-                          cursor: "pointer",
-                          borderRadius: "5px",
-                          boxShadow: "0px 0px 2px gray",
-                        }}
-                      />
-                    </a>
-                  ) : (
-                    "N/A"
-                  )}
-                </td>
+                <td>Return Reason:</td>
+                <td>{selectedRequest?.return_reason}</td>
               </tr>
             </tbody>
           </table>
@@ -283,7 +288,7 @@ const Emp_issue_detail = () => {
           <div className="rejection-detail">
             <>
               <p style={{ color: "#f9a825", borderLeft: "4px solid #f9a825" }}>
-                Notify User
+                Notify User                                           
               </p>
               <textarea
                 value={notification || ""}
@@ -292,7 +297,7 @@ const Emp_issue_detail = () => {
                     ? ""
                     : "Enter a message to notify the user about the status update."
                 }
-                // onChange={(e) => setNotification(e.target.value)}
+                onChange={(e) => setNotification(e.target.value)}
                 style={{
                   backgroundColor: "#fff8e1",
                   padding: "10px",
@@ -300,10 +305,17 @@ const Emp_issue_detail = () => {
                   borderRadius: "8px",
                   outline: "none",
                   resize: "none",
-                  boxShadow: "0 0 3px rgba(0, 0, 0, 0.08)",
+                  boxShadow: "0 0 3px rgba(0, 0, 0, 0.08)",               
                 }}
-              ></textarea>
-              
+              ></textarea>                                        
+              {selectedRequest.requestStatus !== "Return_Completed" && (
+                <button
+                  className="confirm-pending"
+                  onClick={handleNotification}
+                >
+                  Send Notification
+                </button>
+              )}
             </>
           </div>
         )}
@@ -327,59 +339,55 @@ const Emp_issue_detail = () => {
                   value={rejection_Reason}
                   onChange={(e) => setRejectionReason(e.target.value)}
                 ></textarea>
-                {/* <button className="confirm-reject" onClick={handleNotification}>
+                <button className="confirm-reject" onClick={handleNotification}>
                   Confirm Rejection
-                </button> */}
+                </button>
               </>
             )}
           </div>
         )}
       </div>
       <div className="action-buttons">
-        {selectedNotification.message ===
-        "IT has responded to your maintenance request. View their message" ? (
-          <button className="pending-btn" style={{ width: "60%" }}>
-            IT Responded to Maintenance Request
-          </button>
-        ) : selectedNotification.message ===
-          "IT has responded to your lost request. View their message" ? (
-          <button className="pending-btn" style={{ width: "60%" }}>
-            IT Responded to Lost Request
-          </button>
-        ) : selectedNotification.message ===
-          "Your maintenance request is now being processed by IT." ? (
-          <button className="pending-btn" style={{ width: "60%" }}>
-            Maintenance In Progress
-          </button>
-        ) : selectedNotification.message ===
-          "Your maintenance request has been rejected by IT." ? (
-          <button className="reject-btn" style={{ width: "60%" }}>
-            Maintenance Rejected by IT
-          </button>
-        ) : selectedNotification.message ===
-          "Your lost request is now being processed by IT." ? (
-          <button className="pending-btn" style={{ width: "60%" }}>
-            Lost Item Investigation Ongoing
-          </button>
-        ) : selectedNotification.message ===
-          "Your lost request is resolved." ? (
+        {selectedRequest.requestStatus === "Under_Maintenance" ? (
+          <>
+            <button className="approve-btn" onClick={handleApprove}>
+              <p>Maintenance Done</p>
+            </button>
+            <button className="reject-btn" onClick={handleRejectClick}>
+              Reject
+            </button>
+          </>
+        ) : selectedRequest.requestStatus !== "Return_Completed" &&
+          selectedRequest.requestStatus !== "Request Rejected" ? (
+          <>
+            <button className="approve-btn" onClick={handleInitiate}>
+              Send for Maintenance
+            </button>
+            <button className="confirm-btn" onClick={handleConfirmReturn}>
+              Confirm Return
+            </button>
+            <button className="reject-btn" onClick={handleRejectClick}>
+              Reject                                              
+            </button>
+          </>
+        ) : selectedRequest.requestStatus === "Request Rejected" ? (
+          <>
+            <button
+              className="reject-btn"
+              onClick={handleRejectClick}
+              style={{ width: "60%" }}
+            >
+              Asset {selectedRequest.type} Request Rejected By You
+            </button>
+          </>
+        ) : (
           <button className="approve-btn" style={{ width: "60%" }}>
-            Lost Request Resolved
+            Asset Returned Successfully
           </button>
-        ) : selectedNotification.message ===
-          "Your maintenance request is resolved." ? (
-          <button className="approve-btn" style={{ width: "60%" }}>
-            Maintenance Resolved
-          </button>
-        ) : selectedNotification.message ===
-          "Your lost request has been rejected by IT." ? (
-          <button className="rejected-btn" style={{ width: "60%" }}>
-            Lost Request Rejected by IT
-          </button>
-        ) : null}
+        )}
       </div>
     </div>
   );
 };
 
-export default Emp_issue_detail;
+export default IT_return_detail;
