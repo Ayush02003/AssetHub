@@ -8,17 +8,58 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 
+const groupByMonthAndType = (requests) => {
+  const monthlyData = {};
 
-const requestData = [
-  { month: "Jan", Laptops: 20, Monitors: 10, Phones: 5 },
-  { month: "Feb", Laptops: 30, Monitors: 15, Phones: 8 },
-  { month: "Mar", Laptops: 50, Monitors: 25, Phones: 12 },
-  { month: "Apr", Laptops: 40, Monitors: 20, Phones: 10 },
-  { month: "May", Laptops: 60, Monitors: 30, Phones: 15 },
-];
+  requests.forEach((req) => {
+    const month = dayjs(req.createdAt).format("MMM");
+    const type = req.assetType || "";
 
+    if (!monthlyData[month]) {
+      monthlyData[month] = {};
+    }
+
+    if (!monthlyData[month][type]) {                             
+      monthlyData[month][type] = 0; 
+    }
+
+    monthlyData[month][type]++;
+  });
+
+  return Object.entries(monthlyData).map(([month, types]) => ({
+    month,
+    ...types,
+  }));
+};
+                                            
 const AssetLineChart = () => {
+  const [requestData, setRequestData] = useState([]);
+  const [assetTypes, setAssetTypes] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("/api/requests");
+        const formattedData = groupByMonthAndType(res.data.data);
+        setRequestData(formattedData);
+
+        const types = new Set();
+        res.data.data.forEach((req) => {
+          types.add(req.assetType || req.type);
+        });
+        setAssetTypes(Array.from(types));
+      } catch (error) {
+        console.error("Error fetching asset request data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div style={{ width: "100%", height: 300 }}>
       <ResponsiveContainer>
@@ -28,28 +69,29 @@ const AssetLineChart = () => {
           <YAxis allowDecimals={false} />
           <Tooltip />
           <Legend />
-          <Line
-            type="monotone"
-            dataKey="Laptops"
-            stroke="#4c53d7"
-            activeDot={{ r: 6 }}
-          />
-          <Line
-            type="monotone"
-            dataKey="Monitors"
-            stroke="#61abcb"
-            activeDot={{ r: 6 }}
-          />
-          <Line
-            type="monotone"
-            dataKey="Phones"
-            stroke="#a5cfec"
-            activeDot={{ r: 6 }}
-          />
+
+          {assetTypes.map((type) => (
+            <Line
+              key={type}
+              type="monotone"
+              dataKey={type}
+              stroke={getColorByType(type)}
+              activeDot={{ r: 6 }}
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
     </div>
   );
+};
+
+const getColorByType = (type) => {
+  const colors = {                                
+    Laptop: "#4c53d7",
+    Monitor: "#61abcb",
+    Scanner: "#a5cfec",
+  };
+  return colors[type] || "#000000";           
 };
 
 export default AssetLineChart;

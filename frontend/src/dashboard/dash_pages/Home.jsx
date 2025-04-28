@@ -1,13 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../../css/home.css";
 import DonutChart from "../charts/donutchart";
-import BarChart  from "../charts/barchart";
+import BarChart from "../charts/barchart";
 import AssetLineChart from "../charts/Assetlinechart";
 import StackedBarChart from "../charts/Stackedbarchart";
 import ChartTable from "../charts/Charttable";
-const AdminDashboard = () => {
-  const [selectedAsset, setSelectedAsset] = useState("Laptops");
 
+import useAssetStore from "../../zustand/useAssetStore.js";
+import useUserStore from "../../zustand/useUserStore.js";
+import axios from "axios";
+
+const AdminDashboard = () => {
+  const { fetchAssets, assets } = useAssetStore();
+  const { fetchUsers, users } = useUserStore();
+  const [asset_types, setassetType] = useState([]);
+  const [dept, setDepartments] = useState([]);
+  const [selectedAsset, setSelectedAsset] = useState("Laptop");
+  useEffect(() => {
+    fetchAssets();
+    fetchUsers()
+    const fetchAssetType = async () => {
+      try {
+        const res1 = await axios.get("/api/company/get_assetType");
+        setassetType(res1.data.assetTypes);
+        const res2 = await axios.get("/api/company/get_dept");
+        setDepartments(res2.data.dept);
+      } catch (error) {
+        console.log(error)
+      }
+    };
+  fetchAssetType();
+  }, []);
   return (
     <div className="gen_dashboard">
       <div className="upper-div">
@@ -16,7 +39,7 @@ const AdminDashboard = () => {
             <i className="fa fa-box"></i>
           </div>
           <div className="info">
-            <p>100</p>
+            <p>{assets.length}</p>
             <span className="count-tag">Total Assets</span>
           </div>
         </div>
@@ -25,26 +48,27 @@ const AdminDashboard = () => {
             <i className="fa fa-users"></i>
           </div>
           <div className="info">
-            <p>35</p>
+            <p>{users.length}</p>
             <span className="count-tag">Total Users</span>
           </div>
         </div>
         <div className="card">
           <div className="icon">
-            <i className="fa fa-check-circle"></i>
+          <i className="fa fa-cubes"></i>
+
           </div>
           <div className="info">
-            <p>60</p>
-            <span className="count-tag">Allocated</span>
+            <p>{asset_types.length}</p>
+            <span className="count-tag">Total Asset Type</span>
           </div>
         </div>
         <div className="card">
           <div className="icon">
-            <i className="fa fa-times-circle"></i>
+          <i className="fa-solid fa-building-user"></i>
           </div>
           <div className="info">
-            <p>40</p>
-            <span className="count-tag">Unallocated</span>
+            <p>{dept.length}</p>
+            <span className="count-tag">Total Departments</span>
           </div>
         </div>
       </div>
@@ -52,18 +76,19 @@ const AdminDashboard = () => {
       <div className="charts">
         <div className="chart piechart">
           <div className="data">
-            <p>Asset Allocation Status</p>
+            <p>Asset Status</p>
             <select
               value={selectedAsset}
               onChange={(e) => setSelectedAsset(e.target.value)}
             >
-              <option value="Laptops">Laptops</option>
-              <option value="Monitors">Monitors</option>
-              <option value="Phones">Phones</option>
-              <option value="Desktops">Desktops</option>
+              {[...new Set(assets.map((asset) => asset.type))].map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
             </select>
           </div>
-          <DonutChart assetType={selectedAsset} />
+          <DonutChart assetType={selectedAsset} assets={assets} />
         </div>
 
         <div className="chart linechart">
@@ -72,16 +97,17 @@ const AdminDashboard = () => {
         </div>
 
         <div className="chart barchart">
-        <p>Monthly Maintenance & Lost Requests</p>
-          <BarChart /></div>
+          <p>Monthly Maintenance & Lost Requests</p>
+          <BarChart />
+        </div>
 
         <div className="chart stackedchart">
-        <p>Department-wise Asset Allocation</p>
-          <StackedBarChart/>
+          <p>Department-wise Asset Allocation</p>
+          <StackedBarChart />
         </div>
 
         <div className="chart table-data">
-          <ChartTable/>
+          <ChartTable />
         </div>
       </div>
     </div>
